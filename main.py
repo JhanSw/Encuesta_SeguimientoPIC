@@ -61,6 +61,9 @@ db.set_required_for_sections(
     required=False,
 )
 
+# Actualiza el encabezado estándar A..F en todos los grupos de secciones PIC (si aplica)
+db.standardize_pic_group_questions(version_id)
+
 # --- Session init ---
 if "user" not in st.session_state:
     st.session_state.user = None

@@ -32,7 +32,7 @@ def results_page(version_id: int):
     st.metric("Encuestas registradas", n)
 
     # --- Administración: borrar registros ---
-    with st.expander("Borrar registros", expanded=False):
+    with st.expander("Borrar registros", expanded=True):
         st.warning("⚠️ Esto elimina encuestas y sus respuestas. No se puede deshacer.")
         rows = db.list_response_summaries(version_id, limit=300)
         if not rows:
@@ -56,6 +56,14 @@ def results_page(version_id: int):
                     db.delete_all_responses(version_id)
                     st.success("Borradas todas las encuestas.")
                     st.rerun()
+
+    
+    with st.expander("Reparar datos iniciales (si salen en blanco en el Excel)", expanded=False):
+        st.info("Si ya registraste encuestas antes de las últimas actualizaciones, esto intenta rellenar Provincia/Municipio y campos de identificación dentro de metadata para que el Excel los muestre.")
+        if st.button("Reparar datos iniciales en encuestas existentes"):
+            nfix = db.repair_response_metadata_keys(version_id)
+            st.success(f"Listo. Se actualizaron {nfix} encuestas.")
+            st.rerun()
 
     st.caption("Exporta en formato ancho: 1 fila = 1 encuesta; columnas = preguntas.")
 

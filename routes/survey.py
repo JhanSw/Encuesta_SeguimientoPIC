@@ -6,6 +6,31 @@ YES_NO = ["Sí", "No"]
 
 PLACEHOLDER = "Seleccione..."
 
+from pathlib import Path
+import json
+import unicodedata
+import re
+
+@st.cache_data(show_spinner=False)
+def _load_muni_program_map():
+    """Carga el mapeo Municipio -> Secciones habilitadas."""
+    p = Path(__file__).resolve().parent.parent / "data" / "municipio_programas.json"
+    if not p.exists():
+        return {}
+    with open(p, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return data.get("municipality_to_sections", {})
+
+def _norm_key(s: str | None) -> str:
+    if not s:
+        return ""
+    s = str(s).strip().upper()
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = re.sub(r"\s+", " ", s)
+    return s
+
+
 
 def _yes_no_toggle(label: str, key: str, help_text: str | None = None):
     """Selector Sí/No sin valor por defecto.
@@ -134,6 +159,73 @@ def survey_page(version_id: int):
 
 
     form = _get_form_cached(version_id)
+
+    # Filtrar secciones según el municipio (para reducir páginas según programas contratados)
+    muni_map = _load_muni_program_map()
+    muni = st.session_state.get("code_municipality")
+    muni_norm = _norm_key(muni)
+
+    prev_norm = st.session_state.get("_muni_norm_prev")
+    if muni_norm and muni_norm != prev_norm:
+        st.session_state["_muni_norm_prev"] = muni_norm
+        # si el usuario cambió municipio, volvemos al inicio del wizard
+        st.session_state.survey_section_idx = 0
+
+    if muni_norm and muni_map:
+        allowed_sections = muni_map.get(muni_norm) or []
+        # Siempre mostramos PREGUNTAS INICIALES. Si no hay mapeo conocido, mostramos todo.
+        if allowed_sections:
+            initial = form[:1]
+            rest = [s for s in form[1:] if s.get("name") in allowed_sections]
+            form = initial + rest
+
+
+    # Inferir campos iniciales aunque haya preguntas duplicadas sin "code"
+    def _norm(x: str) -> str:
+        import re, unicodedata
+        x = (x or "").lower().strip()
+        x = unicodedata.normalize("NFKD", x).encode("ascii", "ignore").decode("ascii")
+        x = re.sub(r"[^a-z0-9]+", "", x)
+        return x
+
+    def _infer_initial_fields(_form):
+        out = {}
+        for sec in _form:
+            if "preguntas iniciales" not in (sec.get("name","").lower()):
+                continue
+            for grp in sec.get("groups", []):
+                gname_n = _norm(grp.get("title",""))
+                for q in grp.get("questions", []):
+                    qtext_n = _norm(q.get("label") or q.get("text") or "")
+                    val = st.session_state.get(f"q_{q['id']}")
+                    if val in (None, ""):
+                        continue
+                    if "ubic" in gname_n:
+                        if "provinc" in qtext_n:
+                            out.setdefault("province", val)
+                        if "municip" in qtext_n:
+                            out.setdefault("municipality", val)
+                    if "ident" in gname_n:
+                        if "nombre" in qtext_n:
+                            out.setdefault("full_name", val)
+                        if "tipodedocument" in qtext_n or ("tipo" in qtext_n and "document" in qtext_n):
+                            out.setdefault("doc_type", val)
+                        if "numerodedocument" in qtext_n or ("numero" in qtext_n and "document" in qtext_n):
+                            out.setdefault("doc_number", val)
+                        if "celular" in qtext_n or "telefono" in qtext_n:
+                            out.setdefault("phone", val)
+                        if "correo" in qtext_n or "email" in qtext_n:
+                            out.setdefault("email", val)
+                        if "cargo" in qtext_n or "rol" in qtext_n:
+                            out.setdefault("role", val)
+        return out
+
+    inferred = _infer_initial_fields(form)
+    for k, v in inferred.items():
+        ss_key = f"code_{k}"
+        if st.session_state.get(ss_key) in (None, "") and v not in (None, ""):
+            st.session_state[ss_key] = v
+
     if not form:
         st.warning("No hay preguntas configuradas.")
         return
@@ -153,6 +245,15 @@ def survey_page(version_id: int):
     metadata = {
         "encuestador": st.session_state.get("meta_encuestador", ""),
         "observaciones": st.session_state.get("meta_observaciones", ""),
+        # Campos clave (se guardan también en metadata para exportación robusta)
+        "province": st.session_state.get("code_province"),
+        "municipality": st.session_state.get("code_municipality"),
+        "full_name": st.session_state.get("code_full_name"),
+        "doc_type": st.session_state.get("code_doc_type"),
+        "doc_number": st.session_state.get("code_doc_number"),
+        "phone": st.session_state.get("code_phone"),
+        "email": st.session_state.get("code_email"),
+        "role": st.session_state.get("code_role"),
     }
 
     st.progress((idx + 1) / max(1, len(form)))

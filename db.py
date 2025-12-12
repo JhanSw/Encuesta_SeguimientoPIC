@@ -662,6 +662,97 @@ def set_required_for_sections(version_id: int, section_names: list[str], require
         (required, version_id, section_ids),
     )
 
+
+def standardize_pic_group_questions(version_id: int):
+    """Reemplaza el encabezado A..D por el nuevo set A..F en todas las secciones PIC (excepto PREGUNTAS INICIALES).
+
+    - Desactiva preguntas antiguas por grupo
+    - Crea 6 preguntas estándar (A..F) con tipos y opciones
+    """
+    target_sections = [
+        "ENFERMEDADES NO TRANSMISIBLES",
+        "SEGURIDAD ALIMENTARIA",
+        "ENFERMEDADES TRANSMISIBLES",
+        "ENFERMEDADES TRANSMITIDAS POR VECTORES – ETV",
+        "SALUD MENTAL Y SUSTANCIAS PSICOACTIVAS",
+        "SALUD INFANTIL",
+        "SALUD SEXUAL Y REPRODUCTIVA",
+        "SALUD LABORAL",
+        "SALUD AMBIENTAL Y ZOONOSIS",
+    ]
+
+    # Resolver ids de secciones (match tolerante ya implementado en set_required_for_sections,
+    # aquí usamos un match simple por nombre exacto y fallback por normalización)
+    secs = fetchall("SELECT id, name FROM sections WHERE version_id=%s AND is_active=TRUE;", (version_id,))
+    def _norm_name(s: str) -> str:
+        import unicodedata, re
+        s = (s or "").upper()
+        s = unicodedata.normalize("NFKD", s)
+        s = "".join(c for c in s if not unicodedata.combining(c))
+        s = re.sub(r"[^A-Z0-9]+", "", s)
+        return s
+
+    target_norm = {_norm_name(n) for n in target_sections}
+    sec_ids = [s["id"] for s in secs if _norm_name(s["name"]) in target_norm]
+    if not sec_ids:
+        return 0
+
+    groups = fetchall(
+        "SELECT id FROM question_groups WHERE version_id=%s AND section_id = ANY(%s) AND is_active=TRUE;",
+        (version_id, sec_ids)
+    )
+    if not groups:
+        return 0
+
+    # Template
+    template = [
+        ("A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?", "yes_no", None),
+        ("B) ¿USTED PARTICIPÓ EN ALGUNA ACTIVIDAD DEL PLAN DE INTERVENCIONES COLECTIVAS (PIC) DEPARTAMENTAL QUE SE HIZO ESTE AÑO EN SU MUNICIPIO?",
+         "single_choice",
+         ["SÍ", "NO", "NO RECUERDA"]),
+        ("C) MENCIONE UNA ACTIVIDAD QUE SE HAYA REALIZADO EN ESTE PROGRAMA. (PREGUNTA ABIERTA)", "text", None),
+        ("D) LAS ACTIVIDADES DEL PIC A LAS QUE ASISTIÓ, ¿TRATABAN UN TEMA O PROBLEMA QUE SÍ EXISTE EN SU VEREDA O MUNICIPIO?", "yes_no", None),
+        ("E) ¿CREE USTED QUE LAS ACTIVIDADES DEL PIC FUERON ÚTILES O AYUDARON A MEJORAR ALGO SOBRE ESE PROBLEMA EN SU COMUNIDAD?",
+         "single_choice",
+         ["SÍ, AYUDARON BASTANTE", "UN POCO", "NO AYUDARON", "NO SABE / NO RESPONDE"]),
+        ("F) ¿CREE USTED QUE LAS ACTIVIDADES DEL PIC QUE SE HICIERON LE SIRVIERON PARA APRENDER COSAS PARA MEJORAR PRACTICAS DE SALUD EN SU FAMILIA O EN SU COMUNIDAD SOBRE ESE PROBLEMA QUE SE ESTABA TRABAJANDO?",
+         "single_choice",
+         ["SÍ, SIRVIERON MUCHO", "SIRVIERON UN POCO", "NO SIRVIERON", "NO SABE / NO RESPONDE"]),
+    ]
+
+    nchanged = 0
+    for g in groups:
+        gid = int(g["id"])
+        # Si ya existe la pregunta B nueva activa, no tocamos el grupo
+        exists = fetchone(
+            "SELECT 1 AS ok FROM questions WHERE version_id=%s AND group_id=%s AND is_active=TRUE AND text ILIKE %s LIMIT 1;",
+            (version_id, gid, "B)%PARTICIP%PIC%")
+        )
+        if exists:
+            continue
+
+        # Desactivar preguntas previas
+        execute("UPDATE questions SET is_active=FALSE WHERE version_id=%s AND group_id=%s;", (version_id, gid))
+
+        # Insertar nuevas preguntas
+        for order, (qtext, qtype, opts) in enumerate(template, start=1):
+            qrow = fetchone(
+                """INSERT INTO questions(version_id, group_id, code, label, help_text, text, qtype, required, sort_order, is_active)
+                   VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,TRUE) RETURNING id;""",
+                (version_id, gid, None, None, None, qtext, qtype, False, order)
+            )
+            qid = int(qrow["id"])
+            if opts:
+                for oidx, olabel in enumerate(opts, start=1):
+                    execute(
+                        """INSERT INTO question_options(question_id, label, value, meta, sort_order)
+                           VALUES(%s,%s,%s,%s,%s);""",
+                        (qid, olabel, olabel, json.dumps({}), oidx)
+                    )
+        nchanged += 1
+
+    return nchanged
+
 def get_form(version_id: int):
     # sections
     sections = fetchall(
@@ -727,7 +818,7 @@ def save_answer(response_id: int, question: dict, value):
     text_val = bool_val = num_val = json_val = None
 
     if value is None:
-        pass
+        return
     elif qtype == "yes_no":
         bool_val = True if value == "Sí" else False if value == "No" else None
         text_val = value
@@ -795,6 +886,101 @@ def delete_responses(response_ids: list[int]):
 def delete_all_responses(version_id: int):
     execute("DELETE FROM survey_responses WHERE version_id=%s;", (version_id,))
 
+
+def repair_response_metadata_keys(version_id: int):
+    """Intenta rellenar metadata(province/municipality/identificación) en respuestas existentes,
+    leyendo de survey_answers por code o por coincidencia de texto. Seguro de ejecutar varias veces.
+    """
+    import json as _json
+    # Traer respuestas
+    responses = fetchall("SELECT id, metadata FROM survey_responses WHERE version_id=%s ORDER BY id;", (version_id,))
+    if not responses:
+        return 0
+    # Traer posibles respuestas por response_id con su code y textos normalizados
+    ans = fetchall("""
+        SELECT r.id AS response_id,
+               q.code,
+               COALESCE(q.label, q.text) AS qtext,
+               s.name AS section_name, g.title AS group_title,
+               a.value_text, a.value_bool, a.value_number, a.value_json, q.qtype
+        FROM survey_responses r
+        JOIN survey_answers a ON a.response_id=r.id
+        JOIN questions q ON q.id=a.question_id
+        JOIN question_groups g ON g.id=q.group_id
+        JOIN sections s ON s.id=g.section_id
+        WHERE r.version_id=%s
+    """, (version_id,))
+    import pandas as _pd, unicodedata as _ud, re as _re
+    def _norm(x):
+        x=(x or "").lower().strip()
+        x=_ud.normalize("NFKD", x).encode("ascii","ignore").decode("ascii")
+        x=_re.sub(r"[^a-z0-9]+","",x)
+        return x
+    df=_pd.DataFrame(ans) if ans else _pd.DataFrame(columns=["response_id","code","qtext","section_name","group_title","value_text","value_bool","value_number","value_json","qtype"])
+    if not df.empty:
+        def _ans_to_str(r):
+            if r["qtype"]=="yes_no":
+                if r["value_bool"] is True: return "Sí"
+                if r["value_bool"] is False: return "No"
+            if r["value_text"] is not None: return r["value_text"]
+            if r["value_number"] is not None: return r["value_number"]
+            if r["value_json"] is not None:
+                try: return _json.loads(r["value_json"])
+                except Exception: return r["value_json"]
+            return None
+        df["answer"]=df.apply(_ans_to_str, axis=1)
+        df["sec_n"]=df["section_name"].map(_norm)
+        df["grp_n"]=df["group_title"].map(_norm)
+        df["q_n"]=df["qtext"].map(_norm)
+
+    key_specs = {
+        "province": ("preguntas iniciales","ubic","provincia"),
+        "municipality": ("preguntas iniciales","ubic","municip"),
+        "full_name": ("preguntas iniciales","ident","nombre"),
+        "doc_type": ("preguntas iniciales","ident","tipodedocument"),
+        "doc_number": ("preguntas iniciales","ident","numerodedocument"),
+        "phone": ("preguntas iniciales","ident","celular"),
+        "email": ("preguntas iniciales","ident","correo"),
+        "role": ("preguntas iniciales","ident","cargo"),
+    }
+
+    updated=0
+    for r in responses:
+        rid=int(r["id"])
+        meta = {}
+        try:
+            if isinstance(r["metadata"], str) and r["metadata"]:
+                meta=_json.loads(r["metadata"])
+            elif isinstance(r["metadata"], dict):
+                meta=r["metadata"]
+        except Exception:
+            meta={}
+        changed=False
+        for key,(sec_c,grp_c,q_c) in key_specs.items():
+            if meta.get(key) not in (None,""):
+                continue
+            val=None
+            if not df.empty:
+                # primero por code exacto
+                sub=df[(df["response_id"]==rid) & (df["code"]==key)]
+                if not sub.empty:
+                    val=sub.iloc[0]["answer"]
+                else:
+                    sub=df[(df["response_id"]==rid) &
+                           (df["sec_n"].str.contains(_norm(sec_c))) &
+                           (df["grp_n"].str.contains(_norm(grp_c))) &
+                           (df["q_n"].str.contains(_norm(q_c)))]
+                    if not sub.empty:
+                        val=sub.iloc[0]["answer"]
+            if val not in (None,""):
+                meta[key]=val
+                changed=True
+        if changed:
+            execute("UPDATE survey_responses SET metadata=%s WHERE id=%s;", (_json.dumps(meta), rid))
+            updated+=1
+    return updated
+
+
 def export_answers_wide(version_id: int):
     """Retorna DataFrame (1 fila por encuesta, 1 columna por pregunta).
 
@@ -849,6 +1035,13 @@ def export_answers_wide(version_id: int):
     # 2) Metadata por encuesta
     meta = df[["response_id", "created_at", "metadata"]].drop_duplicates("response_id").set_index("response_id")
 
+    # Parse metadata JSON to columns (robusto para Provincia/Municipio/Identificación)
+    try:
+        meta_parsed = meta["metadata"].apply(lambda x: json.loads(x) if isinstance(x, str) and x else (x or {}))
+    except Exception:
+        meta_parsed = meta["metadata"].apply(lambda _: {})
+    meta_cols = pd.json_normalize(meta_parsed).set_index(meta.index)
+
     # 3) Columnas explícitas para ubicación / identificación (más fácil para análisis)
     key_map = {
         "province": "Provincia",
@@ -864,6 +1057,25 @@ def export_answers_wide(version_id: int):
     # Creamos el pivot por código, pero garantizando columnas aunque estén vacías
     code_cols = list(key_map.keys())
     code_pivot = pd.DataFrame(index=meta.index, columns=code_cols)
+
+    # Primero llenar desde metadata (si existe)
+    meta_key_map = {
+        "province": ["province", "Provincia", "provincia"],
+        "municipality": ["municipality", "Municipio", "municipio"],
+        "full_name": ["full_name", "Nombre completo", "nombre_completo", "nombre"],
+        "doc_type": ["doc_type", "Tipo de documento", "tipo_documento"],
+        "doc_number": ["doc_number", "Número de documento", "numero_documento"],
+        "phone": ["phone", "Número de celular", "numero_celular", "celular", "telefono"],
+        "email": ["email", "Correo electrónico", "correo", "correo_electronico"],
+        "role": ["role", "Cargo o rol", "cargo", "rol"],
+    }
+    for k, aliases in meta_key_map.items():
+        if k not in code_pivot.columns:
+            continue
+        for a in aliases:
+            if a in meta_cols.columns:
+                code_pivot[k] = code_pivot[k].combine_first(meta_cols[a])
+                break
     df_code = df[df["code"].isin(code_cols)].copy()
     if not df_code.empty:
         tmp = df_code.pivot_table(index="response_id", columns="code", values="answer", aggfunc="first")
