@@ -8,23 +8,24 @@ PLACEHOLDER = "Seleccione..."
 
 
 def _yes_no_toggle(label: str, key: str):
-    """Botones Sí/No que permiten des-seleccionar (si vuelves a presionar, se limpia)."""
+    """Selector Sí/No sin valor por defecto.
+    Nota: usamos 3 opciones (Sin respuesta/Sí/No) para que el usuario pueda limpiar
+    sin necesidad de 'doble clic' y con feedback inmediato en pantalla.
+    """
+    # Guardamos el valor real en `key` como: None | "Sí" | "No"
     current = st.session_state.get(key)
-    st.markdown(label)
-    c1, c2, c3 = st.columns([1, 1, 6])
-    with c1:
-        if st.button("Sí", key=f"{key}__yes", type="primary" if current == "Sí" else "secondary"):
-            st.session_state[key] = None if current == "Sí" else "Sí"
-    with c2:
-        if st.button("No", key=f"{key}__no", type="primary" if current == "No" else "secondary"):
-            st.session_state[key] = None if current == "No" else "No"
-    with c3:
-        # Muestra el estado actual de forma discreta
-        if st.session_state.get(key) is None:
-            st.caption("Sin respuesta")
-        else:
-            st.caption(f"Seleccionado: {st.session_state.get(key)}")
-    return st.session_state.get(key)
+    opts = ["Sin respuesta", "Sí", "No"]
+    if current == "Sí":
+        idx = 1
+    elif current == "No":
+        idx = 2
+    else:
+        idx = 0
+
+    sel = st.radio(label, opts, index=idx, horizontal=True, key=f"{key}__yn")
+    val = None if sel == "Sin respuesta" else sel
+    st.session_state[key] = val
+    return val
 
 def _clear_button(key: str, label: str = "Limpiar"):
     if st.button(label, key=f"{key}__clear"):
@@ -114,11 +115,24 @@ def _render_question(q, answers, ctx):
 
     ctx[q.get("code") or key] = answers[qid]
 
+@st.cache_data(ttl=60)
+def _get_form_cached(version_id: int):
+    return db.get_form(version_id)
+
 def survey_page(version_id: int):
     st.title("Encuesta - Comunidad General")
     st.caption("Herramienta de seguimiento del PIC 2025")
 
-    form = db.get_form(version_id)
+    # Mensaje post-envío (redirige al inicio automáticamente)
+    if st.session_state.get("_just_submitted"):
+        resp_id = st.session_state.get("_last_response_id")
+        if resp_id:
+            st.success(f"¡Gracias! Encuesta guardada con ID #{resp_id}.")
+        st.info("Puedes diligenciar otra encuesta desde el inicio.")
+        st.session_state.pop("_just_submitted", None)
+
+
+    form = _get_form_cached(version_id)
     if not form:
         st.warning("No hay preguntas configuradas.")
         return
@@ -175,28 +189,16 @@ def survey_page(version_id: int):
         st.rerun()
 
     if submit_clicked:
-        # Validación opcional (por defecto NO se bloquea el envío)
-        enforce_required = os.getenv("ENFORCE_REQUIRED", "0") == "1"
-        missing = []
-        for s in form:
-            for grp in s.get("groups", []):
-                for q in grp.get("questions", []):
-                    if q.get("required"):
-                        val = st.session_state.get(f"q_{q['id']}")
-                        if val in (None, "", [], {}, " "):
-                            missing.append(q["text"])
-        if missing and enforce_required:
-            st.error("Faltan preguntas obligatorias:\n- " + "\n- ".join(missing[:12]) + ("" if len(missing) <= 12 else "\n..."))
-            return
-
         resp_id = db.create_response(version_id, metadata)
+
+        # Guardar todas las respuestas (incluye vacías como NULL, no se bloquea)
         for s in form:
             for grp in s.get("groups", []):
                 for q in grp.get("questions", []):
                     val = st.session_state.get(f"q_{q['id']}")
                     db.save_answer(resp_id, q, val)
 
-        # Limpieza para nueva encuesta
+# Limpieza para nueva encuesta
         for s in form:
             for grp in s.get("groups", []):
                 for q in grp.get("questions", []):
@@ -205,5 +207,9 @@ def survey_page(version_id: int):
                         st.session_state.pop(f"code_{q['code']}", None)
 
         st.session_state.survey_section_idx = 0
-        st.success(f"¡Gracias! Encuesta guardada con ID #{resp_id}.")
-        st.info("Puedes diligenciar otra encuesta desde el inicio.")
+        st.session_state["_last_response_id"] = resp_id
+        st.session_state["_just_submitted"] = True
+        # Limpia metadata opcional
+        st.session_state.pop("meta_encuestador", None)
+        st.session_state.pop("meta_observaciones", None)
+        st.rerun()
