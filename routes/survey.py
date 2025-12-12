@@ -1,9 +1,35 @@
+import os
 import streamlit as st
 import db
 
 YES_NO = ["Sí", "No"]
 
 PLACEHOLDER = "Seleccione..."
+
+
+def _yes_no_toggle(label: str, key: str):
+    """Botones Sí/No que permiten des-seleccionar (si vuelves a presionar, se limpia)."""
+    current = st.session_state.get(key)
+    st.markdown(label)
+    c1, c2, c3 = st.columns([1, 1, 6])
+    with c1:
+        if st.button("Sí", key=f"{key}__yes", type="primary" if current == "Sí" else "secondary"):
+            st.session_state[key] = None if current == "Sí" else "Sí"
+    with c2:
+        if st.button("No", key=f"{key}__no", type="primary" if current == "No" else "secondary"):
+            st.session_state[key] = None if current == "No" else "No"
+    with c3:
+        # Muestra el estado actual de forma discreta
+        if st.session_state.get(key) is None:
+            st.caption("Sin respuesta")
+        else:
+            st.caption(f"Seleccionado: {st.session_state.get(key)}")
+    return st.session_state.get(key)
+
+def _clear_button(key: str, label: str = "Limpiar"):
+    if st.button(label, key=f"{key}__clear"):
+        st.session_state[key] = None
+        st.rerun()
 
 def _render_question(q, answers, ctx):
     qid = q["id"]
@@ -42,13 +68,14 @@ def _render_question(q, answers, ctx):
 
         val = st.selectbox(qtext, options=options, key=key, index=None, placeholder=PLACEHOLDER)
         answers[qid] = val
+        _clear_button(key, "Quitar selección")
         if q.get("code"):
             ctx[q["code"]] = val
             st.session_state[f"code_{q['code']}"] = val
         return
 
     if qtype == "yes_no":
-        val = st.radio(qtext, YES_NO, horizontal=True, key=key, index=None)
+        val = _yes_no_toggle(qtext, key)
         answers[qid] = val
     elif qtype == "text":
         val = st.text_input(qtext, key=key)
@@ -65,6 +92,8 @@ def _render_question(q, answers, ctx):
             else st.text_input(qtext, key=key)
         )
         answers[qid] = val
+        if qtype == "single_choice" and (q.get("options") or []):
+            _clear_button(key, "Quitar selección")
 
         if config.get("has_other") and (val == config.get("other_label", "OTRA")):
             other = st.text_input(config.get("other_text_prompt", "¿Cuál?"), key=f"{key}_other")
@@ -73,6 +102,8 @@ def _render_question(q, answers, ctx):
         options = [o["label"] for o in q.get("options", [])]
         val = st.multiselect(qtext, options=options, key=key)
         answers[qid] = val
+        if val:
+            _clear_button(key, "Quitar selección")
     else:
         val = st.text_input(qtext, key=key)
         answers[qid] = val
@@ -144,7 +175,8 @@ def survey_page(version_id: int):
         st.rerun()
 
     if submit_clicked:
-        # Validar solo obligatorias (en tus bloques se forzó required=False desde main.py)
+        # Validación opcional (por defecto NO se bloquea el envío)
+        enforce_required = os.getenv("ENFORCE_REQUIRED", "0") == "1"
         missing = []
         for s in form:
             for grp in s.get("groups", []):
@@ -153,7 +185,7 @@ def survey_page(version_id: int):
                         val = st.session_state.get(f"q_{q['id']}")
                         if val in (None, "", [], {}, " "):
                             missing.append(q["text"])
-        if missing:
+        if missing and enforce_required:
             st.error("Faltan preguntas obligatorias:\n- " + "\n- ".join(missing[:12]) + ("" if len(missing) <= 12 else "\n..."))
             return
 

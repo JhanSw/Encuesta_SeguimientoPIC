@@ -192,21 +192,47 @@ def ensure_seed(seed_path: str):
 
 
 def set_required_for_sections(version_id: int, section_names: list[str], required: bool = False):
-    """Marca como obligatorias (o no) todas las preguntas de las secciones indicadas."""
+    """Marca como obligatorias (o no) todas las preguntas de las secciones indicadas.
+
+    Esta función hace match de nombres de sección de forma tolerante (ignora tildes,
+    guiones y espacios) para evitar problemas de escritura como '-' vs '–'.
+    """
     if not section_names:
         return
+
+    # Traer secciones reales del version_id
+    rows = fetchall(
+        """
+        SELECT id, name
+        FROM sections
+        WHERE version_id = %s
+        """,
+        (version_id,),
+    )
+
+    def _norm(x: str) -> str:
+        import unicodedata, re as _re
+        x = unicodedata.normalize("NFKD", x).encode("ascii", "ignore").decode("ascii")
+        x = x.lower()
+        x = _re.sub(r"[^a-z0-9]+", "", x)
+        return x
+
+    wanted = {_norm(n) for n in section_names}
+    section_ids = [r["id"] for r in rows if _norm(r["name"]) in wanted]
+
+    if not section_ids:
+        return
+
     execute(
         """
         UPDATE questions q
         SET required = %s
         FROM question_groups g
-        JOIN sections s ON s.id = g.section_id
         WHERE q.group_id = g.id
           AND q.version_id = %s
-          AND s.version_id = %s
-          AND lower(s.name) = ANY(%s);
+          AND g.section_id = ANY(%s);
         """,
-        (required, version_id, version_id, [n.lower() for n in section_names]),
+        (required, version_id, section_ids),
     )
 
 def get_form(version_id: int):
