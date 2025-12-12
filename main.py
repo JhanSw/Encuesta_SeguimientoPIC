@@ -1,4 +1,3 @@
-\
 import os
 from pathlib import Path
 import streamlit as st
@@ -14,7 +13,24 @@ from routes.help_deploy import help_deploy_page
 
 load_dotenv()
 
-st.set_page_config(page_title="Encuesta PIC", layout="wide")
+st.set_page_config(
+    page_title="Encuesta PIC",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
+# --- Pastel blue feel (extra CSS on top of theme) ---
+st.markdown(
+    """
+    <style>
+      .stApp { background-color: #f2f7ff; }
+      [data-testid="stSidebar"] > div:first-child { background-color: #e6f0ff; }
+      .stButton>button { border-radius: 10px; }
+      .stDownloadButton>button { border-radius: 10px; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # --- DB init + seed ---
 db.init_database()
@@ -26,25 +42,25 @@ version_id = db.ensure_seed(seed_path)
 if "user" not in st.session_state:
     st.session_state.user = None
 
-# --- Sidebar ---
+# --- Sidebar (hidden by default, admin can open) ---
 st.sidebar.title("Encuesta PIC")
 
-page = st.sidebar.radio(
-    "Menú",
-    options=[
-        "Encuesta (público)",
+# Login box in sidebar
+auth.login_box(in_sidebar=True)
+if st.session_state.user:
+    st.sidebar.success(f"Sesión: {st.session_state.user['username']} ({st.session_state.user['role']})")
+    auth.logout_button(in_sidebar=True)
+
+menu_options = ["Encuesta (público)"]
+if st.session_state.user:
+    menu_options += [
         "Admin: Gestión de preguntas",
         "Admin: Respuestas / Exportar",
         "Admin: Usuarios",
         "Admin: Ayuda (Deploy)",
-    ],
-)
+    ]
 
-# Login box always visible, but only affects admin pages
-auth.login_box()
-if st.session_state.user:
-    st.sidebar.success(f"Sesión: {st.session_state.user['username']} ({st.session_state.user['role']})")
-    auth.logout_button()
+page = st.sidebar.radio("Menú", options=menu_options)
 
 # --- Routing ---
 if page == "Encuesta (público)":

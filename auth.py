@@ -1,4 +1,3 @@
-\
 import os
 import bcrypt
 import streamlit as st
@@ -27,23 +26,26 @@ def ensure_default_admin():
     password = os.getenv("ADMIN_PASSWORD", "Admin2025!")
     db.insert_user(username, hash_password(password), "admin")
 
-def login_box():
-    with st.expander("Ingreso administrador / editor", expanded=False):
-        username = st.text_input("Usuario", key="login_username")
-        password = st.text_input("Contraseña", type="password", key="login_password")
-        if st.button("Ingresar", type="primary"):
+def login_box(in_sidebar: bool = False):
+    container = st.sidebar if in_sidebar else st
+    with container.expander("Ingreso administrador / editor", expanded=False):
+        username = container.text_input("Usuario", key="login_username")
+        password = container.text_input("Contraseña", type="password", key="login_password")
+        if container.button("Ingresar", type="primary"):
             user = db.get_user_by_username(username)
             if not user or not user.get("is_active"):
-                st.error("Usuario no encontrado o inactivo.")
+                container.error("Usuario no encontrado o inactivo.")
                 return
             if not check_password(password, user["password_hash"]):
-                st.error("Contraseña incorrecta.")
+                container.error("Contraseña incorrecta.")
                 return
             st.session_state.user = {"id": user["id"], "username": user["username"], "role": user["role"]}
-            st.success(f"Bienvenido(a), {user['username']} ({user['role']})")
+            container.success(f"Bienvenido(a), {user['username']} ({user['role']})")
+            st.rerun()
 
-def logout_button():
-    if st.button("Cerrar sesión"):
+def logout_button(in_sidebar: bool = False):
+    container = st.sidebar if in_sidebar else st
+    if container.button("Cerrar sesión"):
         st.session_state.user = None
         st.rerun()
 

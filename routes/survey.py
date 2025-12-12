@@ -1,4 +1,3 @@
-\
 import streamlit as st
 import db
 
@@ -19,17 +18,19 @@ def _render_question(q, answers, ctx):
         if dep_answer is None:
             st.info("Seleccione primero la provincia para ver los municipios.")
             return
-        # filter options by meta key
+
         meta_key = config.get("filter_option_meta_key")
         filtered = []
         for opt in q.get("options", []):
             meta = opt.get("meta") or {}
             if meta.get(meta_key) == dep_answer:
                 filtered.append(opt)
+
         options = [o["label"] for o in filtered]
         if not options:
             st.warning("No hay municipios configurados para esa provincia.")
             return
+
         val = st.selectbox(qtext, options=options, key=key)
         answers[qid] = val
         ctx[q.get("code") or key] = val
@@ -49,7 +50,6 @@ def _render_question(q, answers, ctx):
         val = st.selectbox(qtext, options=options, key=key) if options else st.text_input(qtext, key=key)
         answers[qid] = val
 
-        # handle "other" config (keeps in answers as JSON-ish string)
         if config.get("has_other") and (val == config.get("other_label", "OTRA")):
             other = st.text_input(config.get("other_text_prompt", "¿Cuál?"), key=f"{key}_other")
             answers[qid] = f"{val}: {other}".strip()
@@ -72,25 +72,24 @@ def survey_page(version_id: int):
     answers = {}
     ctx = {}
 
-    # metadata opcional (no es pregunta)
     with st.expander("Información adicional (opcional)"):
         encuestador = st.text_input("Nombre del encuestador(a) (opcional)")
         observaciones = st.text_area("Observaciones (opcional)")
         metadata = {"encuestador": encuestador, "observaciones": observaciones}
     st.divider()
 
-    with st.form("survey_form"):
-        for sec in form:
-            st.header(sec["name"])
-            for grp in sec.get("groups", []):
-                st.subheader(grp["title"])
-                for q in grp.get("questions", []):
-                    _render_question(q, answers, ctx)
-                st.markdown("---")
-        submitted = st.form_submit_button("Enviar encuesta", type="primary")
+    # Render dinámico (SIN st.form) para permitir dependencias en vivo (Provincia -> Municipio)
+    for sec in form:
+        st.header(sec["name"])
+        for grp in sec.get("groups", []):
+            st.subheader(grp["title"])
+            for q in grp.get("questions", []):
+                _render_question(q, answers, ctx)
+            st.markdown("---")
+
+    submitted = st.button("Enviar encuesta", type="primary")
 
     if submitted:
-        # Validación de requeridas
         missing = []
         for sec in form:
             for grp in sec.get("groups", []):
@@ -102,8 +101,7 @@ def survey_page(version_id: int):
             return
 
         resp_id = db.create_response(version_id, metadata)
-        # guardar respuestas
-        # NOTE: municipality depende de province, pero ambos quedan en answers
+
         for sec in form:
             for grp in sec.get("groups", []):
                 for q in grp.get("questions", []):

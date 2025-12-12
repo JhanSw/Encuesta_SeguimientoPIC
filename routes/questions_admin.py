@@ -132,6 +132,41 @@ def questions_admin_page(version_id: int):
                     opts_txt = "\n".join([o["label"] for o in cur_opts]) if cur_opts else ""
                     new_opts = st.text_area("Una opción por línea", value=opts_txt, height=150, key=f"q_opts_{q['id']}")
                     meta_note = st.info("Si necesitas meta (ej. municipios por provincia), edita el JSON en la BD o en el seed. Para el caso municipio, ya viene configurado.")
+                    # Botón especial: sincronizar municipio/provincia desde seed (para meta province)
+                    if (q.get("code") == "municipality") and st.button("Sincronizar municipios por provincia (desde seed)", key=f"sync_muni_{q['id']}"):
+                        try:
+                            from pathlib import Path
+                            import json as _json
+                            seed_path = str(Path(__file__).resolve().parents[1] / "data" / "seed_questions.json")
+                            seed = _json.loads(Path(seed_path).read_text(encoding="utf-8"))
+                            # encontrar opciones del code municipality en el seed
+                            mun_opts = None
+                            prov_opts = None
+                            for sec0 in seed["survey"]["sections"]:
+                                for grp0 in sec0.get("groups", []):
+                                    for q0 in grp0.get("questions", []):
+                                        if q0.get("code") == "municipality":
+                                            mun_opts = q0.get("options", [])
+                                        if q0.get("code") == "province":
+                                            prov_opts = q0.get("options", [])
+                            if mun_opts is None:
+                                st.error("No se encontró 'municipality' en el seed.")
+                            else:
+                                db.delete_options_for_question(q["id"])
+                                for idx, opt in enumerate(mun_opts, start=1):
+                                    db.insert_option(q["id"], opt["label"], opt.get("value", opt["label"]), idx, opt.get("meta", {}))
+                                # opcional: también sincroniza provincias si están en el mismo grupo
+                                if prov_opts is not None:
+                                    prov_row = db.fetchone("SELECT id FROM questions WHERE version_id=%s AND code='province' LIMIT 1;", (version_id,))
+                                    if prov_row:
+                                        db.delete_options_for_question(prov_row["id"])
+                                        for idx, opt in enumerate(prov_opts, start=1):
+                                            db.insert_option(prov_row["id"], opt["label"], opt.get("value", opt["label"]), idx, opt.get("meta", {}))
+                                st.success("Municipios (y provincias) sincronizados.")
+                                st.rerun()
+                        except Exception as e:
+                            st.error(f"Error sincronizando: {e}")
+
                     if st.button("Guardar opciones", key=f"q_opts_save_{q['id']}"):
                         db.delete_options_for_question(q["id"])
                         lines = [l.strip() for l in new_opts.splitlines() if l.strip()]
