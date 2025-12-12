@@ -360,6 +360,9 @@ def ensure_core_question_codes(version_id: int):
         x = _re.sub(r"[^a-z0-9]+", "", x)
         return x
 
+    # Targets by *meaning* (codes) rather than by exact text.
+    # Text matching is used as a first pass, but we also have a robust fallback
+    # based on section/group/order to survive manual edits of the question text.
     targets = [
         ("province", "Provincia a la cual pertenece"),
         ("municipality", "Municipio al que pertenece"),
@@ -373,8 +376,9 @@ def ensure_core_question_codes(version_id: int):
 
     rows = fetchall(
         """
-        SELECT q.id, q.code, q.label, q.text, q.config,
-               s.name AS section_name, g.title AS group_title
+        SELECT q.id, q.group_id, q.sort_order AS q_sort, q.code, q.label, q.text, q.config,
+               s.name AS section_name,
+               g.id AS grp_id, g.title AS group_title, g.sort_order AS grp_sort
         FROM questions q
         JOIN question_groups g ON g.id=q.group_id
         JOIN sections s ON s.id=g.section_id
@@ -404,18 +408,106 @@ def ensure_core_question_codes(version_id: int):
         candidates.sort(reverse=True)
         return candidates[0][1]
 
-    # If a code already exists, keep it; otherwise set it on best match by text
-    for code, ttext in targets:
-        existing = next((r for r in rows if (r.get("code") or "") == code), None)
-        if existing:
-            continue
-        cand_id = find_candidate(ttext)
-        if cand_id is None:
-            continue
-        execute(
-            "UPDATE questions SET code=%s WHERE id=%s AND version_id=%s;",
-            (code, cand_id, version_id),
-        )
+    def _find_by_group_order(section_name: str, group_title_contains: str, pos_1based: int):
+        """Fallback selector: pick the N-th question inside a given section/group."""
+        sn = _norm(section_name)
+        gn = _norm(group_title_contains)
+        bucket = []
+        for r in rows:
+            if _norm(r.get("section_name") or "") != sn:
+                continue
+            if gn not in _norm(r.get("group_title") or ""):
+                continue
+            bucket.append(r)
+        if not bucket:
+            return None
+        # Deterministic order: group order, question order, then id.
+        bucket.sort(key=lambda x: (int(x.get("grp_sort") or 0), int(x.get("q_sort") or 0), int(x["id"])))
+        idx = max(0, pos_1based - 1)
+        if idx >= len(bucket):
+            return None
+        return int(bucket[idx]["id"])
+
+    # If a code exists but is attached to a different question than our best candidate,
+    # we *move* the code to the best candidate (prefer PREGUNTAS INICIALES).
+    # This fixes cases where older versions created duplicates and the code ended up on
+    # the wrong record (export then shows None for Provincia/Municipio/etc.).
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            for code, ttext in targets:
+                cand_id = find_candidate(ttext)
+                # Robust fallback if the question text was edited.
+                if cand_id is None:
+                    if code in ("province", "municipality"):
+                        # Ubicación group in PREGUNTAS INICIALES: first=provincia, second=municipio
+                        cand_id = _find_by_group_order("PREGUNTAS INICIALES", "Ubic", 1 if code == "province" else 2)
+                    elif code in ("full_name", "doc_type", "doc_number", "phone", "email", "role"):
+                        # Identificación group: fixed order
+                        order_map = {
+                            "full_name": 1,
+                            "doc_type": 2,
+                            "doc_number": 3,
+                            "phone": 4,
+                            "email": 5,
+                            "role": 6,
+                        }
+                        cand_id = _find_by_group_order("PREGUNTAS INICIALES", "Ident", order_map.get(code, 1))
+                if cand_id is None:
+                    continue
+
+                cur.execute(
+                    "SELECT id FROM questions WHERE version_id=%s AND code=%s LIMIT 1;",
+                    (version_id, code),
+                )
+                existing = cur.fetchone()
+
+                if existing and int(existing["id"]) == int(cand_id):
+                    continue
+
+                # Free the code if it is currently attached elsewhere
+                if existing and int(existing["id"]) != int(cand_id):
+                    cur.execute(
+                        "UPDATE questions SET code=NULL WHERE id=%s AND version_id=%s;",
+                        (existing["id"], version_id),
+                    )
+
+                # Attach the code to the best candidate
+                cur.execute(
+                    "UPDATE questions SET code=%s WHERE id=%s AND version_id=%s;",
+                    (code, cand_id, version_id),
+                )
+
+        conn.commit()
+
+    # Optional: deactivate obvious duplicates for core fields inside PREGUNTAS INICIALES
+    # (keeps the coded one active). This reduces confusion in UI and ensures answers
+    # land on the right question.
+    try:
+        sec_norm = _norm("PREGUNTAS INICIALES")
+        init_ids = [r for r in rows if _norm(r.get("section_name") or "") == sec_norm]
+        for code, ttext in targets:
+            # Find the coded question id
+            coded = fetchone(
+                "SELECT id FROM questions WHERE version_id=%s AND code=%s LIMIT 1;",
+                (version_id, code),
+            )
+            if not coded:
+                continue
+            coded_id = int(coded["id"])
+            nt = _norm(ttext)
+            dup_ids = []
+            for r in init_ids:
+                if int(r["id"]) == coded_id:
+                    continue
+                if _norm(r.get("label") or "") == nt or _norm(r.get("text") or "") == nt:
+                    dup_ids.append(int(r["id"]))
+            if dup_ids:
+                execute(
+                    "UPDATE questions SET is_active=FALSE WHERE version_id=%s AND id = ANY(%s);",
+                    (version_id, dup_ids),
+                )
+    except Exception:
+        pass
 
     # Ensure municipality has dependency config
     mun = fetchone("SELECT id, config FROM questions WHERE version_id=%s AND code='municipality' LIMIT 1;", (version_id,))
@@ -662,6 +754,51 @@ def export_answers_wide(version_id: int):
         tmp = df_code.pivot_table(index="response_id", columns="code", values="answer", aggfunc="first")
         code_pivot.loc[tmp.index, tmp.columns] = tmp
     code_pivot = code_pivot.rename(columns=key_map)
+
+    # Fallback: si por alguna razón los `code` no quedaron asignados en la BD (o el encuestador
+    # respondió una pregunta duplicada sin code), intentamos completar estas columnas buscando
+    # por texto y por ubicación en la encuesta.
+    def _norm_txt(x: str) -> str:
+        x = (x or "").lower().strip()
+        import re as _re, unicodedata as _ud
+        x = _ud.normalize("NFKD", x).encode("ascii", "ignore").decode("ascii")
+        x = _re.sub(r"[^a-z0-9]+", "", x)
+        return x
+
+    df_fallback = df.copy()
+    df_fallback["sec_n"] = df_fallback["section_name"].map(_norm_txt)
+    df_fallback["grp_n"] = df_fallback["group_title"].map(_norm_txt)
+    df_fallback["q_n"] = df_fallback["question_text"].map(_norm_txt)
+
+    def _fill_from_match(out_col: str, sec_contains: str, grp_contains: str, q_contains: str):
+        # Solo llena donde está vacío
+        if out_col not in code_pivot.columns:
+            return
+        mask_empty = code_pivot[out_col].isna()
+        if not mask_empty.any():
+            return
+        m = (
+            df_fallback["sec_n"].str.contains(_norm_txt(sec_contains))
+            & df_fallback["grp_n"].str.contains(_norm_txt(grp_contains))
+            & df_fallback["q_n"].str.contains(_norm_txt(q_contains))
+        )
+        sub = df_fallback[m]
+        if sub.empty:
+            return
+        tmp = sub.pivot_table(index="response_id", values="answer", aggfunc="first")
+        # Escribimos solo en filas vacías
+        for rid, val in tmp["answer"].items():
+            if rid in code_pivot.index and pd.isna(code_pivot.at[rid, out_col]):
+                code_pivot.at[rid, out_col] = val
+
+    _fill_from_match("Provincia", "preguntas iniciales", "ubic", "provincia")
+    _fill_from_match("Municipio", "preguntas iniciales", "ubic", "municip")
+    _fill_from_match("Nombre completo", "preguntas iniciales", "ident", "nombre")
+    _fill_from_match("Tipo de documento", "preguntas iniciales", "ident", "tipodedocument")
+    _fill_from_match("Número de documento", "preguntas iniciales", "ident", "numerodedocument")
+    _fill_from_match("Número de celular", "preguntas iniciales", "ident", "celular")
+    _fill_from_match("Correo electrónico", "preguntas iniciales", "ident", "correo")
+    _fill_from_match("Cargo o rol", "preguntas iniciales", "ident", "cargo")
 
     # 4) Pivot general por texto de pregunta
     pivot = df.pivot_table(index="response_id", columns="col", values="answer", aggfunc="first")
