@@ -1,0 +1,2300 @@
+{
+  "survey": {
+    "name": "PIC 2025 - Comunidad General",
+    "version_name": "2025 Comunidad General",
+    "sections": [
+      {
+        "name": "PREGUNTAS INICIALES",
+        "order": 1,
+        "groups": [
+          {
+            "title": "Ubicación",
+            "order": 1,
+            "questions": [
+              {
+                "code": "province",
+                "text": "Provincia a la cual pertenece",
+                "type": "single_choice",
+                "required": true,
+                "order": 1,
+                "options": [
+                  {
+                    "label": "COMUNERA",
+                    "value": "COMUNERA"
+                  },
+                  {
+                    "label": "GUANENTÁ",
+                    "value": "GUANENTÁ"
+                  },
+                  {
+                    "label": "GARCÍA ROVIRA",
+                    "value": "GARCÍA ROVIRA"
+                  },
+                  {
+                    "label": "SOTO NORTE",
+                    "value": "SOTO NORTE"
+                  },
+                  {
+                    "label": "VÉLEZ",
+                    "value": "VÉLEZ"
+                  },
+                  {
+                    "label": "YARIGUIES",
+                    "value": "YARIGUIES"
+                  },
+                  {
+                    "label": "METROPOLITANA",
+                    "value": "METROPOLITANA"
+                  }
+                ]
+              },
+              {
+                "code": "municipality",
+                "text": "Municipio al que pertenece",
+                "type": "single_choice",
+                "required": true,
+                "order": 2,
+                "config": {
+                  "depends_on": "province",
+                  "filter_option_meta_key": "province"
+                },
+                "options": [
+                  {
+                    "label": "SOCORRO",
+                    "value": "SOCORRO",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "HATO",
+                    "value": "HATO",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "PALMAS DEL SOCORRO",
+                    "value": "PALMAS DEL SOCORRO",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "PALMAR",
+                    "value": "PALMAR",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "CHIMA",
+                    "value": "CHIMA",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "CONFINES",
+                    "value": "CONFINES",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "CONTRATACION",
+                    "value": "CONTRATACION",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "EL GUACAMAYO",
+                    "value": "EL GUACAMAYO",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "GALÁN",
+                    "value": "GALÁN",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "GUADALUPE",
+                    "value": "GUADALUPE",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "GUAPOTÁ",
+                    "value": "GUAPOTÁ",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "OIBA",
+                    "value": "OIBA",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "SIMACOTA",
+                    "value": "SIMACOTA",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "SUAITA",
+                    "value": "SUAITA",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "GÁMBITA",
+                    "value": "GÁMBITA",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "SANTA HELENA DEL OPÓN",
+                    "value": "SANTA HELENA DEL OPÓN",
+                    "meta": {
+                      "province": "COMUNERA"
+                    }
+                  },
+                  {
+                    "label": "CAPITANEJO",
+                    "value": "CAPITANEJO",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "CARCASÍ",
+                    "value": "CARCASÍ",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "CEPITÁ",
+                    "value": "CEPITÁ",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "CERRITO",
+                    "value": "CERRITO",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "CONCEPCIÒN",
+                    "value": "CONCEPCIÒN",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "ENCISO",
+                    "value": "ENCISO",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "GUACA",
+                    "value": "GUACA",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "MACARAVITA",
+                    "value": "MACARAVITA",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "MÁLAGA",
+                    "value": "MÁLAGA",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "MOLAGAVITA",
+                    "value": "MOLAGAVITA",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "SAN ANDRÉS",
+                    "value": "SAN ANDRÉS",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "SAN JOSÉ DE MIRANDA",
+                    "value": "SAN JOSÉ DE MIRANDA",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "SAN MIGUEL",
+                    "value": "SAN MIGUEL",
+                    "meta": {
+                      "province": "GARCÍA ROVIRA"
+                    }
+                  },
+                  {
+                    "label": "ARATOCA",
+                    "value": "ARATOCA",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "BARICHARA",
+                    "value": "BARICHARA",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "CABRERA",
+                    "value": "CABRERA",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "CHARALÁ",
+                    "value": "CHARALÁ",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "COROMORO",
+                    "value": "COROMORO",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "CURITÍ",
+                    "value": "CURITÍ",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "ENCINO",
+                    "value": "ENCINO",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "JORDÁN",
+                    "value": "JORDÁN",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "MOGOTES",
+                    "value": "MOGOTES",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "OCAMONTE",
+                    "value": "OCAMONTE",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "ONZAGA",
+                    "value": "ONZAGA",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "PÁRAMO",
+                    "value": "PÁRAMO",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "PINCHOTE",
+                    "value": "PINCHOTE",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "SAN GIL",
+                    "value": "SAN GIL",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "SAN JOAQUÍN",
+                    "value": "SAN JOAQUÍN",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "VALLE DE SAN JOSÉ",
+                    "value": "VALLE DE SAN JOSÉ",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "VILLANUEVA",
+                    "value": "VILLANUEVA",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "CEPITÁ",
+                    "value": "CEPITÁ",
+                    "meta": {
+                      "province": "GUANENTÁ"
+                    }
+                  },
+                  {
+                    "label": "CALIFORNIA",
+                    "value": "CALIFORNIA",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "CHARTA",
+                    "value": "CHARTA",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "EL PLAYÓN",
+                    "value": "EL PLAYÓN",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "LEBRIJA",
+                    "value": "LEBRIJA",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "LOS SANTOS",
+                    "value": "LOS SANTOS",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "MATANZA",
+                    "value": "MATANZA",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "RIONEGRO",
+                    "value": "RIONEGRO",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "SANTA BÁRBARA",
+                    "value": "SANTA BÁRBARA",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "SURATÁ",
+                    "value": "SURATÁ",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "TONA",
+                    "value": "TONA",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "VETAS",
+                    "value": "VETAS",
+                    "meta": {
+                      "province": "SOTO NORTE"
+                    }
+                  },
+                  {
+                    "label": "AGUADA",
+                    "value": "AGUADA",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "ALBANIA",
+                    "value": "ALBANIA",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "BARBOSA",
+                    "value": "BARBOSA",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "BOLÍVAR",
+                    "value": "BOLÍVAR",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "CHIPATÁ",
+                    "value": "CHIPATÁ",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "CIMITARRA",
+                    "value": "CIMITARRA",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "EL PEÑÓN",
+                    "value": "EL PEÑÓN",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "FLORIÁN",
+                    "value": "FLORIÁN",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "GUAVATÁ",
+                    "value": "GUAVATÁ",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "GÜEPSA",
+                    "value": "GÜEPSA",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "JESÚS MARÍA",
+                    "value": "JESÚS MARÍA",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "LA BELLEZA",
+                    "value": "LA BELLEZA",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "LA PAZ",
+                    "value": "LA PAZ",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "LANDÁZURI",
+                    "value": "LANDÁZURI",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "PUENTE NACIONAL",
+                    "value": "PUENTE NACIONAL",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "SAN BENITO",
+                    "value": "SAN BENITO",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "SUCRE",
+                    "value": "SUCRE",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "VÉLEZ",
+                    "value": "VÉLEZ",
+                    "meta": {
+                      "province": "VÉLEZ"
+                    }
+                  },
+                  {
+                    "label": "BARRANCABERMEJA",
+                    "value": "BARRANCABERMEJA",
+                    "meta": {
+                      "province": "YARIGUÍES"
+                    }
+                  },
+                  {
+                    "label": "BETULIA",
+                    "value": "BETULIA",
+                    "meta": {
+                      "province": "YARIGUÍES"
+                    }
+                  },
+                  {
+                    "label": "EL CARMEN DE CHUCURÍ",
+                    "value": "EL CARMEN DE CHUCURÍ",
+                    "meta": {
+                      "province": "YARIGUÍES"
+                    }
+                  },
+                  {
+                    "label": "PUERTO PARRA",
+                    "value": "PUERTO PARRA",
+                    "meta": {
+                      "province": "YARIGUÍES"
+                    }
+                  },
+                  {
+                    "label": "PUERTO WILCHES",
+                    "value": "PUERTO WILCHES",
+                    "meta": {
+                      "province": "YARIGUÍES"
+                    }
+                  },
+                  {
+                    "label": "SABANA DE TORRES",
+                    "value": "SABANA DE TORRES",
+                    "meta": {
+                      "province": "YARIGUÍES"
+                    }
+                  },
+                  {
+                    "label": "SAN VICENTE DE CHUCURÍ",
+                    "value": "SAN VICENTE DE CHUCURÍ",
+                    "meta": {
+                      "province": "YARIGUÍES"
+                    }
+                  },
+                  {
+                    "label": "BUCARAMANGA",
+                    "value": "BUCARAMANGA",
+                    "meta": {
+                      "province": "METROPOLITANA"
+                    }
+                  },
+                  {
+                    "label": "FLORIDABLANCA",
+                    "value": "FLORIDABLANCA",
+                    "meta": {
+                      "province": "METROPOLITANA"
+                    }
+                  },
+                  {
+                    "label": "GIRÓN",
+                    "value": "GIRÓN",
+                    "meta": {
+                      "province": "METROPOLITANA"
+                    }
+                  },
+                  {
+                    "label": "PIEDECUESTA",
+                    "value": "PIEDECUESTA",
+                    "meta": {
+                      "province": "METROPOLITANA"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Conocimiento y participación PIC",
+            "order": 2,
+            "questions": [
+              {
+                "code": "q9",
+                "text": "¿CONOCE QUÉ ES EL PLAN DE INTERVENCIONES COLECTIVAS (PIC) DEPARTAMENTAL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": "q10",
+                "text": "¿CONOCE SI ESTE AÑO (2025) SE REALIZARON ACTIVIDADES DE LA SECRETARÍA DE SALUD DEPARTAMENTAL EN EL MUNICIPIO PARA EJECUTAR ACCIONES DEL PLAN DE INTERVENCIONES COLECTIVAS (PIC)?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": "q11",
+                "text": "¿PARTICIPÓ EN ALGUNA ACTIVIDAD DEL PLAN DE INTERVENCIONES COLECTIVAS (PIC)?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": "q12",
+                "text": "¿EN QUÉ ÁREA SE DESARROLLARON LAS ACTIVIDADES REALIZADAS?",
+                "type": "single_choice",
+                "required": true,
+                "order": 4,
+                "options": [
+                  {
+                    "label": "URBANA",
+                    "value": "URBANA"
+                  },
+                  {
+                    "label": "RURAL",
+                    "value": "RURAL"
+                  },
+                  {
+                    "label": "AMBAS",
+                    "value": "AMBAS"
+                  },
+                  {
+                    "label": "OTRA",
+                    "value": "OTRA"
+                  }
+                ],
+                "config": {
+                  "has_other": true,
+                  "other_label": "OTRA",
+                  "other_text_prompt": "¿Cuál?"
+                }
+              },
+              {
+                "code": "q13",
+                "text": "¿A QUIÉNES SE LES REALIZARON LAS INTERVENCIONES? (PUEDE SELECCIONAR VARIAS OPCIONES)",
+                "type": "multi_choice",
+                "required": true,
+                "order": 5,
+                "options": [
+                  {
+                    "label": "DE 0 A 5 AÑOS",
+                    "value": "DE 0 A 5 AÑOS"
+                  },
+                  {
+                    "label": "DE 6 A 11 AÑOS",
+                    "value": "DE 6 A 11 AÑOS"
+                  },
+                  {
+                    "label": "DE 12 A 17 AÑOS",
+                    "value": "DE 12 A 17 AÑOS"
+                  },
+                  {
+                    "label": "DE 18 A 28 AÑOS",
+                    "value": "DE 18 A 28 AÑOS"
+                  },
+                  {
+                    "label": "DE 29 A 59 AÑOS",
+                    "value": "DE 29 A 59 AÑOS"
+                  },
+                  {
+                    "label": "MAYORES DE 60 AÑOS",
+                    "value": "MAYORES DE 60 AÑOS"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ENFERMEDADES NO TRANSMISIBLES",
+        "order": 2,
+        "groups": [
+          {
+            "title": "ACTIVIDADES PARA PROMOVER LA SALUD BUCAL EN EL ENTORNO COMUNITARIO, DIRIGIDA A LAS POBLACIONES DE ADULTEZ Y VEJEZ EN EL ÁMBITO URBANO.",
+            "order": 1,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "PROMOVIERON HÁBITOS SALUDABLES, AUTOCUIDADO FÍSICO Y MENTAL A TRAVÉS DE LA DANZA COMO ESPACIOS INTEGRALES DE PROMOCIÓN CULTURAL, ARTÍSTICA Y MUSICAL EN RITMOS TRADICIONALES CON ESTRATEGIAS EDUCATIVAS EN EL CURSO DE VIDA DE VEJEZ EN ÁREA URBANA.",
+            "order": 2,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "PROMOVIERON HÁBITOS SALUDABLES, AUTOCUIDADO FÍSICO Y MENTAL A TRAVÉS DE LA DANZA COMO ESPACIOS INTEGRALES DE PROMOCIÓN CULTURAL, ARTÍSTICA Y MUSICAL EN RITMOS TRADICIONALES CON ESTRATEGIAS EDUCATIVAS EN EL CURSO DE VIDA INFANCIA Y ADOLESCENCIA EN ÁREA RURAL, ENTORNO EDUCATIVO.",
+            "order": 3,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "SE PROMOVIERON HÁBITOS SALUDABLES, AUTOCUIDADO FÍSICO Y MENTAL A TRAVÉS DE LA DANZA COMO ESPACIOS INTEGRALES DE PROMOCIÓN CULTURAL, ARTÍSTICA Y MUSICAL EN RITMOS TRADICIONALES CON ESTRATEGIAS EDUCATIVAS EN EL CURSO DE VIDA ADOLESCENCIA EN ÁREA URBANA, ENTORNO EDUCATIVO.",
+            "order": 4,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ESTRATEGIA DE INFORMACIÓN EN PREVENCIÓN Y DETECCIÓN DE CÁNCER DE MAMA Y CÁNCER INFANTIL EN EL ENTORNO COMUNITARIO ÁMBITO URBANO EN LOS CURSOS DE VIDA JUVENTUD Y ADULTEZ.",
+            "order": 5,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ESTRATEGIAS DE INFORMACIÓN EN SALUD PARA LA PROMOCIÓN DE MODOS, CONDICIONES Y ESTILOS DE VIDA SALUDABLES.",
+            "order": 6,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ESTRATEGIA DE INFORMACIÓN CON ESTRATEGIA SOY GENERACIÓN MÁS PARA LA PROMOCIÓN DEL CUIDADO DE LA SALUD BUCAL EN PRIMERA INFANCIA, Y ADOLESCENCIA EN ESTABLECIMIENTOS EDUCATIVOS DEL ÁREA RURAL.",
+            "order": 7,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+            "order": 8,
+            "questions": [
+              {
+                "code": null,
+                "text": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+                "type": "text",
+                "required": false,
+                "order": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SEGURIDAD ALIMENTARIA",
+        "order": 3,
+        "groups": [
+          {
+            "title": "ACCIONES DE PROMOCIÓN DE LA LACTANCIA MATERNA Y ALIMENTACIÓN COMPLEMENTARIA EN EL ENTORNO COMUNITARIO, ÁMBITO URBANO DIRIGIDO A PRIMERA INFANCIA.",
+            "order": 1,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "CONFORMACIÓN REDES PARA LA PROMOCIÓN, PROTECCIÓN Y APOYO A LA PRÁCTICA DE LA LACTANCIA MATERNA, LA ADECUADA ALIMENTACIÓN COMPLEMENTARIA Y EL DESARROLLO INTEGRAL DE LAS NIÑAS Y LOS NIÑOS EN EL ENTORNO COMUNITARIO.",
+            "order": 2,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ACCIONES DE GESTIÓN DEL RIESGO DE LA DESNUTRICIÓN EN EL ENTORNO COMUNITARIO, ÁMBITO URBANO DIRIGIDO A PRIMERA INFANCIA.",
+            "order": 3,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ACCIONES DE PROMOCIÓN DE LA ALIMENTACIÓN SALUDABLE EN EL ENTORNO COMUNITARIO, ÁMBITO URBANO DIRIGIDO A ADULTEZ Y VEJEZ.",
+            "order": 4,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ACCIONES DE GESTIÓN DEL RIESGO DE LA MALNUTRICIÓN EN EL ENTORNO COMUNITARIO, ÁMBITO URBANO DIRIGIDO A ADULTEZ Y VEJEZ.",
+            "order": 5,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ESTRATEGIAS DE INFORMACIÓN EN PREVENCIÓN DE CÁNCER DE PRÓSTATA EN ADULTEZ ENTORNO COMUNITARIO Y ÁMBITO URBANO.",
+            "order": 6,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ESTRATEGIAS DE INFORMACIÓN EN PREVENCIÓN Y DETECCIÓN DE CÁNCER DE MAMA Y CÁNCER INFANTIL EN ENTORNO COMUNITARIO, URBANO EN LOS CURSOS DE VIDA DE JUVENTUD Y ADULTEZ.",
+            "order": 7,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+            "order": 8,
+            "questions": [
+              {
+                "code": null,
+                "text": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+                "type": "text",
+                "required": false,
+                "order": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ENFERMEDADES TRANSMISIBLES",
+        "order": 4,
+        "groups": [
+          {
+            "title": "IDENTIFICACIÓN, FORTALECIMIENTO Y CONFORMACIÓN DE REDES COMUNITARIAS CON ENFOQUE ENGAGE TB (TUBERCULOSIS).",
+            "order": 1,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "EDUCACIÓN EN TUBERCULOSIS DIRIGIDA A ADOLESCENTES EN ESTABLECIMIENTOS EDUCATIVOS DEL ÁREA URBANA.",
+            "order": 2,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ESTRATEGIAS DE INFORMACIÓN EN SALUD PARA LA PREVENCIÓN DE TUBERCULOSIS.",
+            "order": 3,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ESTRATEGIAS DE INFORMACIÓN PARA LA SALUD A POBLACIÓN PRIVADA DE LA LIBERTAD, EN EL ENTORNO INSTITUCIONAL URBANO Y RURAL PARA FORTALECER LA GESTIÓN DEL RIESGO EN TB/VIH EN EL ESTABLECIMIENTO CARCELARIO Y PENITENCIARIO.",
+            "order": 4,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ESTRATEGIAS DE INFORMACIÓN EN TUBERCULOSIS DIRIGIDA EN EL CICLO VITAL INFANCIA EN ESTABLECIMIENTOS EDUCATIVOS DEL ÁREA URBANA.",
+            "order": 5,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "CONFORMACIÓN REDES SOCIALES Y COMUNITARIAS EN ACCIONES DE LUCHA CONTRA LA TUBERCULOSIS/VIH, EN POBLACIONES VULNERABLES.",
+            "order": 6,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+            "order": 7,
+            "questions": [
+              {
+                "code": null,
+                "text": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+                "type": "text",
+                "required": false,
+                "order": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ENFERMEDADES TRANSMITIDAS POR VECTORES – ETV",
+        "order": 5,
+        "groups": [
+          {
+            "title": "ESTRATEGIAS DE PREVENCIÓN Y CONTROL DE LAS ENFERMEDADES TRANSMITIDAS POR VECTORES EN ENTORNO COMUNITARIO EN LOS MUNICIPIOS CERTIFICADOS Y EN PROCESO DE CERTIFICACIÓN EN EL PLAN DE INTERRUPCIÓN DE LA ENFERMEDAD DE CHAGAS EN EL MUNICIPIO.",
+            "order": 1,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ACCIONES COLECTIVAS DE PREVENCIÓN Y CONTROL DE LAS ETV Y VACUNACIÓN PARA FIEBRE AMARILLA EN EL MUNICIPIO.",
+            "order": 2,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "INFORMACIÓN Y COMUNICACIÓN EN PREVENCIÓN Y CONTROL DE ENFERMEDADES TRANSMISIBLES EN LOS CURSOS DE VIDA ADOLESCENCIA, JUVENTUD, ADULTEZ Y VEJEZ EN ENTORNO COMUNITARIO ÁREA RURAL EN INDÍGENAS UWA.",
+            "order": 3,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+            "order": 4,
+            "questions": [
+              {
+                "code": null,
+                "text": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+                "type": "text",
+                "required": false,
+                "order": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SALUD MENTAL Y SUSTANCIAS PSICOACTIVAS",
+        "order": 6,
+        "groups": [
+          {
+            "title": "ESTRATEGIA DE INFORMACIÓN EN TABACO, EN JUVENTUD EN EL ENTORNO EDUCATIVO, ÁMBITO URBANO.",
+            "order": 1,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "ACCIONES DE EDUCACIÓN EN EL ENTORNO COMUNITARIO PARA DISMINUIR EL CONSUMO DE ALCOHOL EN POBLACIÓN JOVEN, ÁMBITO URBANO.",
+            "order": 2,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "IMPLEMENTACIÓN ZONAS DE ORIENTACIÓN ESCOLAR EN EL ÁMBITO EDUCATIVO PARA LA PREVENCIÓN DEL CONSUMO DE SUSTANCIAS PSICOACTIVAS EN ADOLESCENTES.",
+            "order": 3,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "FORTALECIMIENTO DE REDES EN EL ENTORNO COMUNITARIO PARA LA PREVENCIÓN DE VIOLENCIAS A TRAVÉS DEL FORTALECIMIENTO DE PAUTAS DE CRIANZA POSITIVA EN PRIMERA INFANCIA EN ÁMBITO URBANO.",
+            "order": 4,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+            "order": 5,
+            "questions": [
+              {
+                "code": null,
+                "text": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+                "type": "text",
+                "required": false,
+                "order": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SALUD INFANTIL",
+        "order": 7,
+        "groups": [
+          {
+            "title": "CICLO DE EDUCACIÓN, COMUNICACIÓN PARA LA SALUD, INTERCAMBIO DE SABERES Y GENERACIÓN DE RESPUESTAS DIRIGIDO A MADRES, PADRES Y DOCENTES EN EL ENTORNO EDUCATIVO DEL ÁMBITO RURAL, PARA SENSIBILIZAR SOBRE LA IMPORTANCIA DE LAS VACUNAS.",
+            "order": 1,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "JORNADAS DE INFORMACIÓN Y COMUNICACIÓN EN EL ENTORNO COMUNITARIO DEL ÁMBITO RURAL PARA FORTALECER LA IMPORTANCIA DE LAS VACUNAS.",
+            "order": 2,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "EDUCACIÓN A ACTORES SOCIALES CLAVES Y AGENTES COMUNITARIOS EN SALUD EN EL ENTORNO COMUNITARIO DEL ÁMBITO URBANO PARA FORTALECER LAS PRÁCTICAS DE CUIDADO EN LA PREVENCIÓN DE IRA Y EDA.",
+            "order": 3,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "CICLO EDUCATIVO PARA LA SALUD DIRIGIDO A MADRES, PADRES Y CUIDADORES SOBRE PRÁCTICAS CLAVE AIEPI EN EL ENTORNO COMUNITARIO DEL ÁMBITO RURAL, PARA LA IDENTIFICACIÓN Y CUIDADOS DE ENFERMEDADES PREVALENTES DE LA INFANCIA.",
+            "order": 4,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+            "order": 5,
+            "questions": [
+              {
+                "code": null,
+                "text": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+                "type": "text",
+                "required": false,
+                "order": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SALUD SEXUAL Y REPRODUCTIVA",
+        "order": 8,
+        "groups": [
+          {
+            "title": "EDUCACIÓN EN EL ENTORNO EDUCATIVO ÁMBITO URBANO PARA LA PREVENCIÓN DE EMBARAZO EN ADOLESCENTES.",
+            "order": 1,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "EDUCACIÓN EN EL ENTORNO COMUNITARIO ÁMBITO URBANO RELACIONADA CON SALUD PARA POBLACIÓN LGBTIQ+.",
+            "order": 2,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "EDUCACIÓN EN EL ENTORNO EDUCATIVO, ÁMBITO URBANO PARA LA PREVENCIÓN DE LA VIOLENCIA SEXUAL EN POBLACIÓN INFANTIL.",
+            "order": 3,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "MECANISMOS DE INFORMACIÓN EN SALUD PARA FORTALECER LAS ACCIONES EN SALUD SEXUAL Y REPRODUCTIVA.",
+            "order": 4,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "CICLO DE EDUCACIÓN DIRIGIDA A PERSONAS CON DISCAPACIDAD, PADRES Y CUIDADORES EN DERECHOS SEXUALES Y REPRODUCTIVOS, EN EL ENTORNO COMUNITARIO ÁMBITO URBANO.",
+            "order": 5,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+            "order": 6,
+            "questions": [
+              {
+                "code": null,
+                "text": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+                "type": "text",
+                "required": false,
+                "order": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SALUD LABORAL",
+        "order": 9,
+        "groups": [
+          {
+            "title": "ESTRATEGIAS DE INFORMACIÓN EN PREVENCIÓN DE RIESGOS LABORALES Y ENFERMEDADES DE LA POBLACIÓN DE LA ECONOMÍA POPULAR Y COMUNITARIA DERIVADAS DE SU OCUPACIÓN EN ÁREA URBANA Y RURAL DE LOS CURSOS DE VIDA JUVENTUD, ADULTEZ Y VEJEZ ENMARCADO DENTRO DEL PROYECTO FORTALECIMIENTO DE LAS ACCIONES DE PREVENCIÓN Y GESTIÓN DE LOS RIESGOS LABORALES EN LA POBLACIÓN DE LA ECONOMÍA POPULAR Y COMUNITARIA.",
+            "order": 1,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "IMPLEMENTACIÓN DE LA SÍNTESIS DE INTERVENCIÓN DE LA POBLACIÓN DE LA ECONOMÍA POPULAR Y COMUNITARIA EN ÁREA URBANA Y RURAL DE LOS CURSOS DE VIDA JUVENTUD, ADULTEZ Y VEJEZ.",
+            "order": 2,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+            "order": 3,
+            "questions": [
+              {
+                "code": null,
+                "text": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+                "type": "text",
+                "required": false,
+                "order": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SALUD AMBIENTAL Y ZOONOSIS",
+        "order": 10,
+        "groups": [
+          {
+            "title": "ACTIVIDADES DE INFORMACIÓN PARA LA SALUD EN ENTORNO COMUNITARIO EN MÍNIMO 20 ACTORES EN CADA ACTIVIDAD, SOBRE LA ESTRATEGIA DE MOVILIDAD, SALUDABLE, SEGURA Y SOSTENIBLE – EMSSS (USO DE ZONAS SEGURAS, INFRAESTRUCTURA SEGURA COMO: PUENTES Y PASOS PEATONALES, RECONOCIMIENTO Y APROPIACIÓN DE SEÑALES DE TRÁNSITO), ADEMÁS DE MEDIDAS PARA LA REDUCCIÓN DE LOS RIESGOS QUE SE GENERAN EN EL ESPACIO PÚBLICO, IMPLEMENTACIÓN DE BUENAS PRÁCTICAS (UTILIZACIÓN DE ELEMENTOS DE PROTECCIÓN PERSONAL, MANTENIMIENTO DE MEDIOS DE TRANSPORTE), LAS ACTIVIDADES TUVIERON QUE SER ARTICULADAS, CON LAS ENTIDADES MUNICIPALES QUE TAMBIÉN PROMUEVAN LA ESTRATEGIA DE SEGURIDAD VIAL (POLICÍA NACIONAL, SECRETARIAS DE TRÁNSITO O TRANSPORTE, INSPECTOR DE POLICÍA, SECRETARIA DE SALUD Y OTRAS), ADEMÁS DE INVOLUCRAR A LOS ACTORES MÁS VULNERABLES EN LA VÍA COMO LO SON: LOS MOTOCICLISTAS, CICLISTAS Y PEATONES.",
+            "order": 1,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "CICLO DE EDUCACIÓN PARA LA SALUD EN 10 VIVIENDAS DE 20 VIVIENDAS CARACTERIZADAS, SOBRE LA ESTRATEGIA DE VIVIENDA SALUDABLE – EVS, EN EL ENTORNO HOGAR, QUE PERMITA ADELANTAR ACCIONES DE PROMOCIÓN DE LA SALUD Y GESTIÓN DEL RIESGO EN LA SALUD RELACIONADOS A LOS FACTORES DEL AMBIENTE.",
+            "order": 2,
+            "questions": [
+              {
+                "code": null,
+                "text": "A) ¿FUE INVITADO(A) A PARTICIPAR EN ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 1
+              },
+              {
+                "code": null,
+                "text": "B) ¿USTED ASISTIÓ AL DESARROLLO DE ESTA ACTIVIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 2
+              },
+              {
+                "code": null,
+                "text": "C) ¿CONSIDERA QUE LA ACTIVIDAD REALIZADA FUE ÚTIL?",
+                "type": "yes_no",
+                "required": true,
+                "order": 3
+              },
+              {
+                "code": null,
+                "text": "D) ¿CONOCE SI LA PROBLEMÁTICA TRATADA EN LA ACTIVIDAD ESTÁ PRESENTE EN SU COMUNIDAD?",
+                "type": "yes_no",
+                "required": true,
+                "order": 4
+              }
+            ]
+          },
+          {
+            "title": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+            "order": 3,
+            "questions": [
+              {
+                "code": null,
+                "text": "¿CONSIDERA QUE SE REALIZÓ OTRA ACTIVIDAD ADICIONAL QUE NO ESTÁ INCLUIDA EN LAS PREGUNTAS ANTERIORES? SI SU RESPUESTA ES SÍ, POR FAVOR MENCIÓNELA: ______________________________",
+                "type": "text",
+                "required": false,
+                "order": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
