@@ -11,6 +11,18 @@ Q_TYPES = [
     ("multi_choice", "Selección múltiple"),
 ]
 
+def _sanitize_title(x: str) -> str:
+    """Quita líneas de guiones/underscores usadas como "espacio para llenar" en Word."""
+    if not x:
+        return x
+    import re
+    # múltiples underscores o guiones seguidos -> se eliminan
+    x = re.sub(r"[_]{3,}", "", x)
+    x = re.sub(r"[-]{3,}", "", x)
+    # colapsar espacios
+    x = re.sub(r"\s{2,}", " ", x)
+    return x.strip()
+
 def _safe_json(text):
     try:
         return json.loads(text) if text.strip() else {}
@@ -106,19 +118,58 @@ def questions_admin_page(version_id: int):
                 qs = g.get("questions", [])
 
         for q in qs:
-            with st.expander(f"Editar pregunta: {q['text'][:80]}", expanded=False):
-                text = st.text_area("Texto", value=q["text"], key=f"q_text_{q['id']}")
+            display = (q.get('label') or q['text'] or "")
+            with st.expander(f"Editar pregunta: {display[:80]}", expanded=False):
+                label = st.text_area(
+                    "Nombre / Enunciado (lo que ve el encuestado)",
+                    value=(q.get("label") or q["text"]),
+                    key=f"q_label_{q['id']}",
+                    height=80,
+                )
+                help_text = st.text_input(
+                    "Ayuda (opcional, debajo del enunciado)",
+                    value=q.get("help_text") or "",
+                    key=f"q_help_{q['id']}",
+                )
+                text = st.text_area(
+                    "Descripción interna / respaldo (opcional)",
+                    value=q["text"],
+                    key=f"q_text_{q['id']}",
+                    height=120,
+                )
                 code = st.text_input("Code (opcional, único por versión)", value=q.get("code") or "", key=f"q_code_{q['id']}")
                 qtype = st.selectbox("Tipo", options=[t[0] for t in Q_TYPES], format_func=lambda v: dict(Q_TYPES)[v], index=[t[0] for t in Q_TYPES].index(q["qtype"]), key=f"q_type_{q['id']}")
                 required = st.checkbox("Obligatoria", value=bool(q["required"]), key=f"q_req_{q['id']}")
                 order = st.number_input("Orden", min_value=1, value=int(q["sort_order"]), key=f"q_ord_{q['id']}")
                 active = st.checkbox("Activa", value=bool(q["is_active"]), key=f"q_act_{q['id']}")
 
+                c1, c2 = st.columns([1, 3])
+                with c1:
+                    if st.button("Quitar _____", key=f"q_clean_{q['id']}"):
+                        st.session_state[f"q_label_{q['id']}"] = _sanitize_title(st.session_state.get(f"q_label_{q['id']}", ""))
+                        st.session_state[f"q_text_{q['id']}"] = _sanitize_title(st.session_state.get(f"q_text_{q['id']}", ""))
+                        st.rerun()
+                with c2:
+                    st.caption("Tip: el nombre/enunciado es lo que aparece arriba en la encuesta. Puedes editarlo aquí.")
+
                 config_txt = st.text_area("Config (JSON) - opcional", value=json.dumps(q.get("config") or {}, ensure_ascii=False, indent=2), height=120, key=f"q_cfg_{q['id']}")
                 if st.button("Guardar pregunta", key=f"q_save_{q['id']}"):
                     try:
                         config = _safe_json(config_txt)
-                        db.upsert_question(version_id, q["id"], grp_id, code.strip() or None, text.strip(), qtype, bool(required), int(order), bool(active), config)
+                        db.upsert_question(
+                            version_id,
+                            q["id"],
+                            grp_id,
+                            code.strip() or None,
+                            (label.strip() or text.strip()),
+                            text.strip(),
+                            (help_text.strip() or None),
+                            qtype,
+                            bool(required),
+                            int(order),
+                            bool(active),
+                            config,
+                        )
                         st.success("Guardado.")
                         st.rerun()
                     except Exception as e:
@@ -177,7 +228,9 @@ def questions_admin_page(version_id: int):
 
         st.markdown("---")
         st.subheader("Crear pregunta")
-        text = st.text_area("Texto nueva pregunta", key="q_new_text")
+        label = st.text_area("Nombre / Enunciado (lo que ve el encuestado)", key="q_new_label")
+        help_text = st.text_input("Ayuda (opcional)", key="q_new_help")
+        text = st.text_area("Descripción interna / respaldo (opcional)", key="q_new_text")
         code = st.text_input("Code (opcional)", key="q_new_code")
         qtype = st.selectbox("Tipo", options=[t[0] for t in Q_TYPES], format_func=lambda v: dict(Q_TYPES)[v], key="q_new_type")
         required = st.checkbox("Obligatoria", value=False, key="q_new_req")
@@ -185,12 +238,25 @@ def questions_admin_page(version_id: int):
         config_txt = st.text_area("Config JSON (opcional)", value="{}", height=90, key="q_new_cfg")
 
         if st.button("Crear pregunta", type="primary", key="q_new_btn"):
-            if not text.strip():
-                st.error("Texto requerido.")
+            if not (label.strip() or text.strip()):
+                st.error("El enunciado es requerido.")
                 return
             try:
                 config = _safe_json(config_txt)
-                db.upsert_question(version_id, None, grp_id, code.strip() or None, text.strip(), qtype, bool(required), int(order), True, config)
+                db.upsert_question(
+                    version_id,
+                    None,
+                    grp_id,
+                    code.strip() or None,
+                    (label.strip() or text.strip()),
+                    (text.strip() or label.strip()),
+                    (help_text.strip() or None),
+                    qtype,
+                    bool(required),
+                    int(order),
+                    True,
+                    config,
+                )
                 st.success("Pregunta creada.")
                 st.rerun()
             except Exception as e:

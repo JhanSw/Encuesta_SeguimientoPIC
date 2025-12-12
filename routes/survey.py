@@ -7,7 +7,7 @@ YES_NO = ["Sí", "No"]
 PLACEHOLDER = "Seleccione..."
 
 
-def _yes_no_toggle(label: str, key: str):
+def _yes_no_toggle(label: str, key: str, help_text: str | None = None):
     """Selector Sí/No sin valor por defecto.
     Nota: usamos 3 opciones (Sin respuesta/Sí/No) para que el usuario pueda limpiar
     sin necesidad de 'doble clic' y con feedback inmediato en pantalla.
@@ -22,7 +22,7 @@ def _yes_no_toggle(label: str, key: str):
     else:
         idx = 0
 
-    sel = st.radio(label, opts, index=idx, horizontal=True, key=f"{key}__yn")
+    sel = st.radio(label, opts, index=idx, horizontal=True, key=f"{key}__yn", help=help_text)
     val = None if sel == "Sin respuesta" else sel
     st.session_state[key] = val
     return val
@@ -35,7 +35,8 @@ def _clear_button(key: str, label: str = "Limpiar"):
 def _render_question(q, answers, ctx):
     qid = q["id"]
     qtype = q["qtype"]
-    qtext = q["text"]
+    qtext = (q.get("label") or q["text"]).strip()
+    qhelp = (q.get("help_text") or "").strip() or None
     key = f"q_{qid}"
 
     config = q.get("config") or {}
@@ -67,7 +68,7 @@ def _render_question(q, answers, ctx):
         if prev is not None and prev not in options:
             st.session_state[key] = None
 
-        val = st.selectbox(qtext, options=options, key=key, index=None, placeholder=PLACEHOLDER)
+        val = st.selectbox(qtext, options=options, key=key, index=None, placeholder=PLACEHOLDER, help=qhelp)
         answers[qid] = val
         _clear_button(key, "Quitar selección")
         if q.get("code"):
@@ -76,21 +77,21 @@ def _render_question(q, answers, ctx):
         return
 
     if qtype == "yes_no":
-        val = _yes_no_toggle(qtext, key)
+        val = _yes_no_toggle(qtext, key, qhelp)
         answers[qid] = val
     elif qtype == "text":
-        val = st.text_input(qtext, key=key)
+        val = st.text_input(qtext, key=key, help=qhelp)
         answers[qid] = val
     elif qtype == "number":
         # text_input para permitir vacío (no marcar por defecto)
-        val = st.text_input(qtext, key=key, placeholder="(opcional)")
+        val = st.text_input(qtext, key=key, placeholder="(opcional)", help=qhelp)
         answers[qid] = val
     elif qtype == "single_choice":
         options = [o["label"] for o in q.get("options", [])]
         val = (
-            st.selectbox(qtext, options=options, key=key, index=None, placeholder=PLACEHOLDER)
+            st.selectbox(qtext, options=options, key=key, index=None, placeholder=PLACEHOLDER, help=qhelp)
             if options
-            else st.text_input(qtext, key=key)
+            else st.text_input(qtext, key=key, help=qhelp)
         )
         answers[qid] = val
         if qtype == "single_choice" and (q.get("options") or []):
@@ -101,12 +102,12 @@ def _render_question(q, answers, ctx):
             answers[qid] = f"{val}: {other}".strip()
     elif qtype == "multi_choice":
         options = [o["label"] for o in q.get("options", [])]
-        val = st.multiselect(qtext, options=options, key=key)
+        val = st.multiselect(qtext, options=options, key=key, help=qhelp)
         answers[qid] = val
         if val:
             _clear_button(key, "Quitar selección")
     else:
-        val = st.text_input(qtext, key=key)
+        val = st.text_input(qtext, key=key, help=qhelp)
         answers[qid] = val
 
     if q.get("code"):

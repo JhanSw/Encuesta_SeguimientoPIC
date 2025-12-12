@@ -74,7 +74,12 @@ def init_database():
                 version_id INTEGER NOT NULL REFERENCES survey_versions(id) ON DELETE CASCADE,
                 group_id INTEGER NOT NULL REFERENCES question_groups(id) ON DELETE CASCADE,
                 code TEXT NULL,
+                -- label: lo que ve el encuestado (nombre/enunciado). Si es NULL, usar `text`.
+                label TEXT NULL,
+                -- text: descripción larga / respaldo (también se usa como fallback de label)
                 text TEXT NOT NULL,
+                -- ayuda opcional debajo del enunciado
+                help_text TEXT NULL,
                 qtype TEXT NOT NULL,
                 required BOOLEAN NOT NULL DEFAULT FALSE,
                 sort_order INTEGER NOT NULL DEFAULT 1,
@@ -83,6 +88,12 @@ def init_database():
             );
             """)
             cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS uq_questions_code ON questions(version_id, code) WHERE code IS NOT NULL;")
+
+            # Migración ligera (para BD existentes): agregar columnas si faltan.
+            cur.execute("ALTER TABLE questions ADD COLUMN IF NOT EXISTS label TEXT NULL;")
+            cur.execute("ALTER TABLE questions ADD COLUMN IF NOT EXISTS help_text TEXT NULL;")
+            # Rellenar label cuando esté vacío (para que siempre haya un enunciado editable).
+            cur.execute("UPDATE questions SET label = text WHERE label IS NULL;")
             cur.execute("""
             CREATE TABLE IF NOT EXISTS question_options (
                 id SERIAL PRIMARY KEY,
@@ -168,12 +179,22 @@ def ensure_seed(seed_path: str):
                     grp_id = cur.fetchone()["id"]
                     for q in grp.get("questions", []):
                         cur.execute(
-                            "INSERT INTO questions(version_id,group_id,code,text,qtype,required,sort_order,is_active,config) VALUES(%s,%s,%s,%s,%s,%s,%s,TRUE,%s) RETURNING id;",
+                            """
+                            INSERT INTO questions(
+                                version_id, group_id, code,
+                                label, text, help_text,
+                                qtype, required, sort_order, is_active, config
+                            )
+                            VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,TRUE,%s)
+                            RETURNING id;
+                            """,
                             (
                                 version_id,
                                 grp_id,
                                 q.get("code"),
+                                (q.get("label") or q.get("text")),
                                 q["text"],
+                                (q.get("help_text") or q.get("help") or q.get("description")),
                                 q["type"],
                                 bool(q.get("required", False)),
                                 q.get("order", 1),
@@ -349,7 +370,8 @@ def export_answers_wide(version_id: int):
     """
     rows = fetchall("""
         SELECT r.id AS response_id, r.created_at, r.metadata,
-               s.name AS section_name, g.title AS group_title, q.id AS question_id, q.text AS question_text, q.qtype,
+               s.name AS section_name, g.title AS group_title,
+               q.id AS question_id, COALESCE(q.label, q.text) AS question_text, q.qtype,
                a.value_text, a.value_bool, a.value_number, a.value_json
         FROM survey_responses r
         JOIN survey_answers a ON a.response_id = r.id
@@ -406,16 +428,61 @@ def upsert_group(version_id: int, group_id, section_id: int, title: str, sort_or
         execute("INSERT INTO question_groups(version_id,section_id,title,sort_order,is_active) VALUES(%s,%s,%s,%s,%s);",
                 (version_id, section_id, title, sort_order, is_active))
 
-def upsert_question(version_id: int, question_id, group_id: int, code, text: str, qtype: str, required: bool, sort_order: int, is_active: bool, config: dict):
+def upsert_question(
+    version_id: int,
+    question_id,
+    group_id: int,
+    code,
+    label: str,
+    text: str,
+    help_text: str | None,
+    qtype: str,
+    required: bool,
+    sort_order: int,
+    is_active: bool,
+    config: dict,
+):
     if question_id:
-        execute("""UPDATE questions
-                  SET group_id=%s, code=%s, text=%s, qtype=%s, required=%s, sort_order=%s, is_active=%s, config=%s
-                  WHERE id=%s AND version_id=%s;""",
-                (group_id, code or None, text, qtype, required, sort_order, is_active, json.dumps(config or {}), question_id, version_id))
+        execute(
+            """UPDATE questions
+               SET group_id=%s, code=%s, label=%s, text=%s, help_text=%s,
+                   qtype=%s, required=%s, sort_order=%s, is_active=%s, config=%s
+               WHERE id=%s AND version_id=%s;""",
+            (
+                group_id,
+                code or None,
+                label,
+                text,
+                help_text,
+                qtype,
+                required,
+                sort_order,
+                is_active,
+                json.dumps(config or {}),
+                question_id,
+                version_id,
+            ),
+        )
     else:
-        execute("""INSERT INTO questions(version_id,group_id,code,text,qtype,required,sort_order,is_active,config)
-                   VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s);""",
-                (version_id, group_id, code or None, text, qtype, required, sort_order, is_active, json.dumps(config or {})))
+        execute(
+            """INSERT INTO questions(
+                   version_id,group_id,code,label,text,help_text,qtype,required,sort_order,is_active,config
+               )
+               VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);""",
+            (
+                version_id,
+                group_id,
+                code or None,
+                label,
+                text,
+                help_text,
+                qtype,
+                required,
+                sort_order,
+                is_active,
+                json.dumps(config or {}),
+            ),
+        )
 
 def delete_options_for_question(question_id: int):
     execute("DELETE FROM question_options WHERE question_id=%s;", (question_id,))
