@@ -673,8 +673,99 @@
             ]
           },
           {
-            "title": "Conocimiento y participación PIC",
+            "title": "Identificación",
             "order": 2,
+            "questions": [
+              {
+                "code": "full_name",
+                "label": "NOMBRE COMPLETO",
+                "text": "NOMBRE COMPLETO",
+                "type": "text",
+                "required": false,
+                "order": 1
+              },
+              {
+                "code": "doc_type",
+                "label": "TIPO DE DOCUMENTO",
+                "text": "TIPO DE DOCUMENTO",
+                "type": "single_choice",
+                "required": false,
+                "order": 2,
+                "options": [
+                  {
+                    "label": "RC - REGISTRO CIVIL",
+                    "value": "RC",
+                    "order": 1
+                  },
+                  {
+                    "label": "TI - TARJETA DE IDENTIDAD",
+                    "value": "TI",
+                    "order": 2
+                  },
+                  {
+                    "label": "CC - CÉDULA DE CIUDADANÍA",
+                    "value": "CC",
+                    "order": 3
+                  },
+                  {
+                    "label": "CE - CÉDULA DE EXTRANJERÍA",
+                    "value": "CE",
+                    "order": 4
+                  },
+                  {
+                    "label": "PEP - PERMISO ESPECIAL DE PERMANENCIA",
+                    "value": "PEP",
+                    "order": 5
+                  },
+                  {
+                    "label": "DNI - DOCUMENTO NACIONAL DE IDENTIDAD",
+                    "value": "DNI",
+                    "order": 6
+                  },
+                  {
+                    "label": "PA - PASAPORTE",
+                    "value": "PA",
+                    "order": 7
+                  }
+                ]
+              },
+              {
+                "code": "doc_number",
+                "label": "NÚMERO DE DOCUMENTO",
+                "text": "NÚMERO DE DOCUMENTO",
+                "type": "text",
+                "required": false,
+                "order": 3
+              },
+              {
+                "code": "phone",
+                "label": "NÚMERO DE CELULAR",
+                "text": "NÚMERO DE CELULAR",
+                "type": "text",
+                "required": false,
+                "order": 4
+              },
+              {
+                "code": "email",
+                "label": "CORREO ELECTRÓNICO",
+                "text": "CORREO ELECTRÓNICO",
+                "type": "text",
+                "required": false,
+                "order": 5
+              },
+              {
+                "code": "role",
+                "label": "¿CUÁL ES SU CARGO O ROL?",
+                "text": "¿CUÁL ES SU CARGO O ROL?",
+                "type": "text",
+                "required": false,
+                "order": 6
+              }
+            ]
+          },
+          {
+            "title": "Conocimiento y participación PIC",
+            "order": 3,
             "questions": [
               {
                 "code": "q9",

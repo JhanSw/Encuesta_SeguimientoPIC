@@ -212,6 +212,136 @@ def ensure_seed(seed_path: str):
     return version_id
 
 
+
+
+def ensure_initial_identity_questions(version_id: int):
+    """Asegura que existan las preguntas de identificación en 'PREGUNTAS INICIALES'.
+    Se usa para BD ya sembradas (no depende del seed).
+    """
+    import unicodedata, re as _re
+
+    def _norm(x: str) -> str:
+        x = unicodedata.normalize("NFKD", x).encode("ascii", "ignore").decode("ascii")
+        x = x.lower()
+        x = _re.sub(r"[^a-z0-9]+", "", x)
+        return x
+
+    # Buscar sección "PREGUNTAS INICIALES"
+    sections = fetchall("SELECT id, name FROM sections WHERE version_id=%s;", (version_id,))
+    sec_id = None
+    for s in sections:
+        if _norm(s["name"]) == _norm("PREGUNTAS INICIALES"):
+            sec_id = s["id"]
+            break
+    if not sec_id:
+        return
+
+    # Definición de grupo + preguntas
+    group_title = "Identificación"
+    questions_def = [
+        {"code": "full_name", "label": "NOMBRE COMPLETO", "text": "NOMBRE COMPLETO", "qtype": "text", "sort_order": 1},
+        {
+            "code": "doc_type",
+            "label": "TIPO DE DOCUMENTO",
+            "text": "TIPO DE DOCUMENTO",
+            "qtype": "single_choice",
+            "sort_order": 2,
+            "options": [
+                ("RC - REGISTRO CIVIL", "RC", 1),
+                ("TI - TARJETA DE IDENTIDAD", "TI", 2),
+                ("CC - CÉDULA DE CIUDADANÍA", "CC", 3),
+                ("CE - CÉDULA DE EXTRANJERÍA", "CE", 4),
+                ("PEP - PERMISO ESPECIAL DE PERMANENCIA", "PEP", 5),
+                ("DNI - DOCUMENTO NACIONAL DE IDENTIDAD", "DNI", 6),
+                ("PA - PASAPORTE", "PA", 7),
+            ],
+        },
+        {"code": "doc_number", "label": "NÚMERO DE DOCUMENTO", "text": "NÚMERO DE DOCUMENTO", "qtype": "text", "sort_order": 3},
+        {"code": "phone", "label": "NÚMERO DE CELULAR", "text": "NÚMERO DE CELULAR", "qtype": "text", "sort_order": 4},
+        {"code": "email", "label": "CORREO ELECTRÓNICO", "text": "CORREO ELECTRÓNICO", "qtype": "text", "sort_order": 5},
+        {"code": "role", "label": "¿CUÁL ES SU CARGO O ROL?", "text": "¿CUÁL ES SU CARGO O ROL?", "qtype": "text", "sort_order": 6},
+    ]
+
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            # Asegurar grupo Identificación en esa sección
+            cur.execute(
+                """
+                SELECT id, sort_order FROM question_groups
+                WHERE version_id=%s AND section_id=%s AND lower(title)=lower(%s)
+                LIMIT 1;
+                """,
+                (version_id, sec_id, group_title),
+            )
+            g = cur.fetchone()
+            if g:
+                grp_id = g["id"]
+                cur.execute(
+                    "UPDATE question_groups SET sort_order=%s, is_active=TRUE WHERE id=%s;",
+                    (2, grp_id),
+                )
+            else:
+                cur.execute(
+                    """
+                    INSERT INTO question_groups(version_id, section_id, title, sort_order, is_active)
+                    VALUES(%s,%s,%s,%s,TRUE) RETURNING id;
+                    """,
+                    (version_id, sec_id, group_title, 2),
+                )
+                grp_id = cur.fetchone()["id"]
+
+            # Si existe el grupo "Conocimiento y participación PIC" con sort_order=2, moverlo a 3
+            cur.execute(
+                """
+                UPDATE question_groups
+                SET sort_order=3
+                WHERE version_id=%s AND section_id=%s AND lower(title)=lower(%s) AND sort_order=2;
+                """,
+                (version_id, sec_id, "Conocimiento y participación PIC"),
+            )
+
+            # Upsert preguntas por code
+            for qd in questions_def:
+                cur.execute(
+                    "SELECT id FROM questions WHERE version_id=%s AND code=%s LIMIT 1;",
+                    (version_id, qd["code"]),
+                )
+                existing = cur.fetchone()
+                if existing:
+                    qid = existing["id"]
+                    cur.execute(
+                        """
+                        UPDATE questions
+                        SET group_id=%s, label=%s, text=%s, qtype=%s, required=FALSE,
+                            sort_order=%s, is_active=TRUE
+                        WHERE id=%s AND version_id=%s;
+                        """,
+                        (grp_id, qd["label"], qd["text"], qd["qtype"], qd["sort_order"], qid, version_id),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        INSERT INTO questions(version_id, group_id, code, label, text, qtype, required, sort_order, is_active, config)
+                        VALUES(%s,%s,%s,%s,%s,%s,FALSE,%s,TRUE,'{}'::jsonb)
+                        RETURNING id;
+                        """,
+                        (version_id, grp_id, qd["code"], qd["label"], qd["text"], qd["qtype"], qd["sort_order"]),
+                    )
+                    qid = cur.fetchone()["id"]
+
+                # Opciones para tipo documento
+                if qd.get("options"):
+                    cur.execute("DELETE FROM question_options WHERE question_id=%s;", (qid,))
+                    for (lbl, val, order) in qd["options"]:
+                        cur.execute(
+                            """
+                            INSERT INTO question_options(question_id, label, value, sort_order, meta)
+                            VALUES(%s,%s,%s,%s,'{}'::jsonb);
+                            """,
+                            (qid, lbl, val, order),
+                        )
+
+        conn.commit()
 def set_required_for_sections(version_id: int, section_names: list[str], required: bool = False):
     """Marca como obligatorias (o no) todas las preguntas de las secciones indicadas.
 
@@ -371,7 +501,7 @@ def export_answers_wide(version_id: int):
     rows = fetchall("""
         SELECT r.id AS response_id, r.created_at, r.metadata,
                s.name AS section_name, g.title AS group_title,
-               q.id AS question_id, COALESCE(q.label, q.text) AS question_text, q.qtype,
+               q.id AS question_id, q.code AS code, COALESCE(q.label, q.text) AS question_text, q.qtype,
                a.value_text, a.value_bool, a.value_number, a.value_json
         FROM survey_responses r
         JOIN survey_answers a ON a.response_id = r.id
@@ -406,8 +536,26 @@ def export_answers_wide(version_id: int):
     df["col"] = df.apply(lambda r: f'{r["section_name"]} | {r["group_title"]} | {r["question_text"]}', axis=1)
 
     meta = df[["response_id","created_at","metadata"]].drop_duplicates("response_id").set_index("response_id")
+
+    # Columnas explícitas para ubicación / identificación (más fácil para análisis)
+    key_map = {
+        "province": "Provincia",
+        "municipality": "Municipio",
+        "full_name": "Nombre completo",
+        "doc_type": "Tipo de documento",
+        "doc_number": "Número de documento",
+        "phone": "Número de celular",
+        "email": "Correo electrónico",
+        "role": "Cargo o rol",
+    }
+    df_code = df[df["code"].isin(list(key_map.keys()))].copy()
+    code_pivot = pd.DataFrame(index=meta.index)
+    if not df_code.empty:
+        code_pivot = df_code.pivot_table(index="response_id", columns="code", values="answer", aggfunc="first")
+        code_pivot = code_pivot.rename(columns=key_map)
+
     pivot = df.pivot_table(index="response_id", columns="col", values="answer", aggfunc="first")
-    out = meta.join(pivot, how="left").reset_index()
+    out = meta.join(code_pivot, how="left").join(pivot, how="left").reset_index()
     return out
 
 # --- CRUD básicos (secciones/grupos/preguntas/opciones) ---
