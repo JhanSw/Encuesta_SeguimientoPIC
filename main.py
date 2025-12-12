@@ -38,6 +38,23 @@ auth.ensure_default_admin()
 seed_path = str(Path(__file__).parent / "data" / "seed_questions.json")
 version_id = db.ensure_seed(seed_path)
 
+# Regla PIC: todos estos bloques (todo menos "PREGUNTAS INICIALES") NO deben ser obligatorios.
+db.set_required_for_sections(
+    version_id,
+    [
+        "ENFERMEDADES NO TRASMISIBLES",
+        "SEGURIDAD ALIMENTARIA",
+        "ENFERMEDADES TRASMISIBLES",
+        "ENFERMEDADES TRANSMITIDAS POR VECTORES - ETV",
+        "SALUD MENTAL Y SUSTANCIAS PSICOACTIVAS",
+        "SALUD INFANTIL",
+        "SALUD SEXUAL Y REPRODUCTIVA",
+        "SALUD LABORAL",
+        "SALUD AMBIENTAL Y ZOONOSIS",
+    ],
+    required=False,
+)
+
 # --- Session init ---
 if "user" not in st.session_state:
     st.session_state.user = None

@@ -190,6 +190,25 @@ def ensure_seed(seed_path: str):
 
     return version_id
 
+
+def set_required_for_sections(version_id: int, section_names: list[str], required: bool = False):
+    """Marca como obligatorias (o no) todas las preguntas de las secciones indicadas."""
+    if not section_names:
+        return
+    execute(
+        """
+        UPDATE questions q
+        SET required = %s
+        FROM question_groups g
+        JOIN sections s ON s.id = g.section_id
+        WHERE q.group_id = g.id
+          AND q.version_id = %s
+          AND s.version_id = %s
+          AND lower(s.name) = ANY(%s);
+        """,
+        (required, version_id, version_id, [n.lower() for n in section_names]),
+    )
+
 def get_form(version_id: int):
     # sections
     sections = fetchall(
