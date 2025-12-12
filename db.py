@@ -342,6 +342,100 @@ def ensure_initial_identity_questions(version_id: int):
                         )
 
         conn.commit()
+
+
+def ensure_core_question_codes(version_id: int):
+    """Para BD ya sembradas: asegura que preguntas clave tengan los `code` esperados.
+
+    Esto arregla exportación (Provincia/Municipio/Identificación) cuando la BD fue sembrada
+    con versiones anteriores donde esas preguntas existían pero sin `code`.
+    """
+    import unicodedata as _ud
+    import re as _re
+
+    def _norm(x: str) -> str:
+        x = x or ""
+        x = _ud.normalize("NFKD", x).encode("ascii", "ignore").decode("ascii")
+        x = x.lower().strip()
+        x = _re.sub(r"[^a-z0-9]+", "", x)
+        return x
+
+    targets = [
+        ("province", "Provincia a la cual pertenece"),
+        ("municipality", "Municipio al que pertenece"),
+        ("full_name", "NOMBRE COMPLETO"),
+        ("doc_type", "TIPO DE DOCUMENTO"),
+        ("doc_number", "NÚMERO DE DOCUMENTO"),
+        ("phone", "NÚMERO DE CELULAR"),
+        ("email", "CORREO ELECTRÓNICO"),
+        ("role", "¿CUÁL ES SU CARGO O ROL?"),
+    ]
+
+    rows = fetchall(
+        """
+        SELECT q.id, q.code, q.label, q.text, q.config,
+               s.name AS section_name, g.title AS group_title
+        FROM questions q
+        JOIN question_groups g ON g.id=q.group_id
+        JOIN sections s ON s.id=g.section_id
+        WHERE q.version_id=%s
+        ORDER BY q.id;
+        """,
+        (version_id,),
+    )
+
+    by_id = {r["id"]: r for r in rows}
+
+    # helper: find candidate by normalized label/text (prefer in PREGUNTAS INICIALES)
+    def find_candidate(target_text: str):
+        nt = _norm(target_text)
+        candidates = []
+        for r in rows:
+            if _norm(r.get("label") or "") == nt or _norm(r.get("text") or "") == nt:
+                # prefer initial section
+                score = 0
+                if _norm(r.get("section_name") or "") == _norm("PREGUNTAS INICIALES"):
+                    score += 10
+                if r.get("code") is None:
+                    score += 5
+                candidates.append((score, r["id"]))
+        if not candidates:
+            return None
+        candidates.sort(reverse=True)
+        return candidates[0][1]
+
+    # If a code already exists, keep it; otherwise set it on best match by text
+    for code, ttext in targets:
+        existing = next((r for r in rows if (r.get("code") or "") == code), None)
+        if existing:
+            continue
+        cand_id = find_candidate(ttext)
+        if cand_id is None:
+            continue
+        execute(
+            "UPDATE questions SET code=%s WHERE id=%s AND version_id=%s;",
+            (code, cand_id, version_id),
+        )
+
+    # Ensure municipality has dependency config
+    mun = fetchone("SELECT id, config FROM questions WHERE version_id=%s AND code='municipality' LIMIT 1;", (version_id,))
+    if mun:
+        cfg = mun.get("config") or {}
+        # cfg may come as dict already (jsonb) with RealDictCursor
+        if isinstance(cfg, str):
+            try:
+                cfg = json.loads(cfg)
+            except Exception:
+                cfg = {}
+        changed = False
+        if cfg.get("depends_on") != "province":
+            cfg["depends_on"] = "province"
+            changed = True
+        if cfg.get("filter_option_meta_key") != "province":
+            cfg["filter_option_meta_key"] = "province"
+            changed = True
+        if changed:
+            execute("UPDATE questions SET config=%s WHERE id=%s AND version_id=%s;", (json.dumps(cfg), mun["id"], version_id))
 def set_required_for_sections(version_id: int, section_names: list[str], required: bool = False):
     """Marca como obligatorias (o no) todas las preguntas de las secciones indicadas.
 

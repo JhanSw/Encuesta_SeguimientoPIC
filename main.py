@@ -41,6 +41,9 @@ version_id = db.ensure_seed(seed_path)
 # Asegura campos de identificación (para BD ya sembradas)
 db.ensure_initial_identity_questions(version_id)
 
+# Asegura que Provincia/Municipio y campos iniciales tengan codes (para exportar siempre)
+db.ensure_core_question_codes(version_id)
+
 # Regla PIC: todos estos bloques (todo menos "PREGUNTAS INICIALES") NO deben ser obligatorios.
 db.set_required_for_sections(
     version_id,
