@@ -1,4 +1,3 @@
-\
 import io
 import datetime
 import streamlit as st
@@ -32,10 +31,40 @@ def results_page(version_id: int):
     n = db.count_responses(version_id)
     st.metric("Encuestas registradas", n)
 
+    # --- Administración: borrar registros ---
+    with st.expander("Borrar registros", expanded=False):
+        st.warning("⚠️ Esto elimina encuestas y sus respuestas. No se puede deshacer.")
+        rows = db.list_response_summaries(version_id, limit=300)
+        if not rows:
+            st.info("No hay registros para borrar.")
+        else:
+            opts = [
+                f"#{r['id']} | {str(r['created_at'])[:19]}" for r in rows
+            ]
+            sel = st.multiselect("Selecciona encuestas a borrar", options=opts)
+            confirm = st.checkbox("Confirmo que quiero borrar los registros seleccionados", value=False)
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("Borrar seleccionadas", type="primary", disabled=(not sel or not confirm)):
+                    ids = [int(x.split("|", 1)[0].replace("#", "").strip()) for x in sel]
+                    db.delete_responses(ids)
+                    st.success(f"Borradas {len(ids)} encuestas.")
+                    st.rerun()
+            with c2:
+                confirm_all = st.checkbox("Confirmo borrar TODAS las encuestas", value=False)
+                if st.button("Borrar TODO", disabled=(not confirm_all), help="Elimina todas las encuestas de esta versión"):
+                    db.delete_all_responses(version_id)
+                    st.success("Borradas todas las encuestas.")
+                    st.rerun()
+
     st.caption("Exporta en formato ancho: 1 fila = 1 encuesta; columnas = preguntas.")
 
     if st.button("Generar Excel", type="primary", disabled=(n==0)):
-        df = db.export_answers_wide(version_id)
+        try:
+            df = db.export_answers_wide(version_id)
+        except Exception as e:
+            st.error(f"No se pudo exportar: {e}")
+            st.stop()
         if df.empty:
             st.warning("No hay datos para exportar.")
             return

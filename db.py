@@ -528,6 +528,96 @@ def ensure_core_question_codes(version_id: int):
             changed = True
         if changed:
             execute("UPDATE questions SET config=%s WHERE id=%s AND version_id=%s;", (json.dumps(cfg), mun["id"], version_id))
+
+    # En bases ya "tocadas" es común que queden duplicados en PREGUNTAS INICIALES.
+    # Para evitar que el encuestador responda una pregunta "sin code" (y luego el Excel muestre None),
+    # forzamos que en los grupos clave solo queden activas las preguntas con los codes esperados.
+    try:
+        import unicodedata as _ud
+        import re as _re
+
+        def _norm2(x: str) -> str:
+            x = x or ""
+            x = _ud.normalize("NFKD", x).encode("ascii", "ignore").decode("ascii")
+            x = x.lower().strip()
+            x = _re.sub(r"[^a-z0-9]+", "", x)
+            return x
+
+        # Encontrar section_id de PREGUNTAS INICIALES
+        srow = fetchone(
+            "SELECT id FROM sections WHERE version_id=%s AND is_active=TRUE ORDER BY id;",
+            (version_id,),
+        )
+        # Buscamos por nombre tolerante
+        srow = fetchone(
+            "SELECT id FROM sections WHERE version_id=%s AND is_active=TRUE;",
+            (version_id,),
+        )
+        init_section = fetchone(
+            "SELECT id, name FROM sections WHERE version_id=%s AND is_active=TRUE;",
+            (version_id,),
+        )
+        init_section_id = None
+        for s in fetchall("SELECT id, name FROM sections WHERE version_id=%s;", (version_id,)):
+            if _norm2(s.get("name")) == _norm2("PREGUNTAS INICIALES"):
+                init_section_id = int(s["id"])
+                break
+        if init_section_id is not None:
+            groups_init = fetchall(
+                "SELECT id, title FROM question_groups WHERE version_id=%s AND section_id=%s;",
+                (version_id, init_section_id),
+            )
+            ubic_gid = None
+            ident_gid = None
+            for g in groups_init:
+                t = _norm2(g.get("title"))
+                if ubic_gid is None and "ubic" in t:
+                    ubic_gid = int(g["id"])
+                if ident_gid is None and "ident" in t:
+                    ident_gid = int(g["id"])
+
+            # Mantener solo los ids con code en esos grupos
+            keep_ids = set()
+            for code in ("province", "municipality", "full_name", "doc_type", "doc_number", "phone", "email", "role"):
+                r = fetchone("SELECT id FROM questions WHERE version_id=%s AND code=%s LIMIT 1;", (version_id, code))
+                if r:
+                    keep_ids.add(int(r["id"]))
+
+            if ubic_gid:
+                # Solo province/municipality deben quedar activas en Ubicación
+                keep_ubic = set()
+                for code in ("province", "municipality"):
+                    r = fetchone("SELECT id FROM questions WHERE version_id=%s AND code=%s LIMIT 1;", (version_id, code))
+                    if r:
+                        keep_ubic.add(int(r["id"]))
+                if keep_ubic:
+                    execute(
+                        "UPDATE questions SET is_active=FALSE WHERE version_id=%s AND group_id=%s AND id <> ALL(%s);",
+                        (version_id, ubic_gid, list(keep_ubic)),
+                    )
+                    execute(
+                        "UPDATE questions SET is_active=TRUE WHERE version_id=%s AND id = ANY(%s);",
+                        (version_id, list(keep_ubic)),
+                    )
+
+            if ident_gid:
+                keep_ident = set()
+                for code in ("full_name", "doc_type", "doc_number", "phone", "email", "role"):
+                    r = fetchone("SELECT id FROM questions WHERE version_id=%s AND code=%s LIMIT 1;", (version_id, code))
+                    if r:
+                        keep_ident.add(int(r["id"]))
+                if keep_ident:
+                    execute(
+                        "UPDATE questions SET is_active=FALSE WHERE version_id=%s AND group_id=%s AND id <> ALL(%s);",
+                        (version_id, ident_gid, list(keep_ident)),
+                    )
+                    execute(
+                        "UPDATE questions SET is_active=TRUE WHERE version_id=%s AND id = ANY(%s);",
+                        (version_id, list(keep_ident)),
+                    )
+    except Exception:
+        # Nunca tumbar la app por un repair
+        pass
 def set_required_for_sections(version_id: int, section_names: list[str], required: bool = False):
     """Marca como obligatorias (o no) todas las preguntas de las secciones indicadas.
 
@@ -680,6 +770,31 @@ def count_responses(version_id: int) -> int:
     row = fetchone("SELECT COUNT(*) AS n FROM survey_responses WHERE version_id=%s;", (version_id,))
     return int(row["n"])
 
+def list_response_summaries(version_id: int, limit: int = 200):
+    """Lista respuestas para administración (borrado/validación)."""
+    return fetchall(
+        """
+        SELECT id, created_at, metadata
+        FROM survey_responses
+        WHERE version_id=%s
+        ORDER BY id DESC
+        LIMIT %s;
+        """,
+        (version_id, limit),
+    )
+
+def delete_responses(response_ids: list[int]):
+    """Borra respuestas (cascada borra answers)."""
+    if not response_ids:
+        return
+    execute(
+        "DELETE FROM survey_responses WHERE id = ANY(%s);",
+        (response_ids,),
+    )
+
+def delete_all_responses(version_id: int):
+    execute("DELETE FROM survey_responses WHERE version_id=%s;", (version_id,))
+
 def export_answers_wide(version_id: int):
     """Retorna DataFrame (1 fila por encuesta, 1 columna por pregunta).
 
@@ -785,9 +900,12 @@ def export_answers_wide(version_id: int):
         sub = df_fallback[m]
         if sub.empty:
             return
-        tmp = sub.pivot_table(index="response_id", values="answer", aggfunc="first")
+        # NOTA: pivot_table puede devolver columnas con nombres inesperados o incluso
+        # un resultado sin la columna "answer" en algunos edge-cases. Usamos groupby
+        # para hacerlo robusto.
+        ser = sub.groupby("response_id")["answer"].first()
         # Escribimos solo en filas vacías
-        for rid, val in tmp["answer"].items():
+        for rid, val in ser.items():
             if rid in code_pivot.index and pd.isna(code_pivot.at[rid, out_col]):
                 code_pivot.at[rid, out_col] = val
 
