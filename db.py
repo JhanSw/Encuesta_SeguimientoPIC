@@ -495,9 +495,16 @@ def count_responses(version_id: int) -> int:
     return int(row["n"])
 
 def export_answers_wide(version_id: int):
+    """Retorna DataFrame (1 fila por encuesta, 1 columna por pregunta).
+
+    Importante:
+    - Siempre incluye las columnas clave (Provincia/Municipio/Identificación) aunque estén vacías.
+    - Siempre incluye todas las preguntas activas de la versión (aunque todas estén en blanco),
+      para que el Excel tenga estructura estable.
     """
-    Retorna DataFrame (1 fila por encuesta, 1 columna por pregunta).
-    """
+    import pandas as pd
+
+    # 1) Traer todas las respuestas (pueden tener valores NULL)
     rows = fetchall("""
         SELECT r.id AS response_id, r.created_at, r.metadata,
                s.name AS section_name, g.title AS group_title,
@@ -511,8 +518,8 @@ def export_answers_wide(version_id: int):
         WHERE r.version_id=%s
         ORDER BY r.id, q.id;
     """, (version_id,))
-    import pandas as pd
 
+    # Si no hay ninguna encuesta, retorna vacío
     if not rows:
         return pd.DataFrame()
 
@@ -529,15 +536,19 @@ def export_answers_wide(version_id: int):
         if row["value_number"] is not None:
             return row["value_number"]
         if row["value_json"] is not None:
-            return json.loads(row["value_json"])
+            try:
+                return json.loads(row["value_json"])
+            except Exception:
+                return row["value_json"]
         return None
 
     df["answer"] = df.apply(answer_to_str, axis=1)
     df["col"] = df.apply(lambda r: f'{r["section_name"]} | {r["group_title"]} | {r["question_text"]}', axis=1)
 
-    meta = df[["response_id","created_at","metadata"]].drop_duplicates("response_id").set_index("response_id")
+    # 2) Metadata por encuesta
+    meta = df[["response_id", "created_at", "metadata"]].drop_duplicates("response_id").set_index("response_id")
 
-    # Columnas explícitas para ubicación / identificación (más fácil para análisis)
+    # 3) Columnas explícitas para ubicación / identificación (más fácil para análisis)
     key_map = {
         "province": "Provincia",
         "municipality": "Municipio",
@@ -548,13 +559,35 @@ def export_answers_wide(version_id: int):
         "email": "Correo electrónico",
         "role": "Cargo o rol",
     }
-    df_code = df[df["code"].isin(list(key_map.keys()))].copy()
-    code_pivot = pd.DataFrame(index=meta.index)
-    if not df_code.empty:
-        code_pivot = df_code.pivot_table(index="response_id", columns="code", values="answer", aggfunc="first")
-        code_pivot = code_pivot.rename(columns=key_map)
 
+    # Creamos el pivot por código, pero garantizando columnas aunque estén vacías
+    code_cols = list(key_map.keys())
+    code_pivot = pd.DataFrame(index=meta.index, columns=code_cols)
+    df_code = df[df["code"].isin(code_cols)].copy()
+    if not df_code.empty:
+        tmp = df_code.pivot_table(index="response_id", columns="code", values="answer", aggfunc="first")
+        code_pivot.loc[tmp.index, tmp.columns] = tmp
+    code_pivot = code_pivot.rename(columns=key_map)
+
+    # 4) Pivot general por texto de pregunta
     pivot = df.pivot_table(index="response_id", columns="col", values="answer", aggfunc="first")
+
+    # 5) Asegurar que el Excel incluya TODAS las preguntas activas de la versión (aunque estén vacías)
+    qrows = fetchall("""
+        SELECT s.sort_order AS sec_order, g.sort_order AS grp_order, q.sort_order AS q_order,
+               s.name AS section_name, g.title AS group_title, COALESCE(q.label, q.text) AS question_text
+        FROM questions q
+        JOIN question_groups g ON g.id = q.group_id
+        JOIN sections s ON s.id = g.section_id
+        WHERE q.version_id=%s AND q.is_active=TRUE AND g.is_active=TRUE AND s.is_active=TRUE
+        ORDER BY s.sort_order, g.sort_order, q.sort_order, q.id;
+    """, (version_id,))
+
+    all_question_cols = [f'{r["section_name"]} | {r["group_title"]} | {r["question_text"]}' for r in qrows]
+
+    # Reindex: agrega columnas faltantes con NaN y respeta el orden del formulario
+    pivot = pivot.reindex(columns=all_question_cols)
+
     out = meta.join(code_pivot, how="left").join(pivot, how="left").reset_index()
     return out
 
